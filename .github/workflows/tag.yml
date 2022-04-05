@@ -14,6 +14,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: tag
+        id: tag_generator
         uses: paulhatch/semantic-version@v4.0.2
         with:
           tag_prefix: "v"
@@ -24,3 +25,13 @@ jobs:
           bump_each_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.tag_generator.outputs.version }}',
+              sha: context.sha
+            })
