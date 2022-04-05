@@ -1,3 +1,3 @@
 # mgr8
 
-Agnostic tool hat abstracts migration operations 
+Agnostic tool hat abstracts migration operations
