@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN ddi VARCHAR(3);

@@ -27,6 +27,7 @@ func Execute() {
 		Use:   "apply",
 		Short: "apply runs migrations in the selected database",
 		Run: applyCommand.Execute,
+		Args: cobra.MinimumNArgs(1),
 	}
 	applyCmd.Flags().StringVar(&applyCommand.Database, "database", "", "Database URL")
 	rootCmd.AddCommand(generateCmd)
