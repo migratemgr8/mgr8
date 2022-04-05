@@ -6,10 +6,15 @@ on:
       - master
 
 jobs:
-  release:
+  tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: paulhatch/semantic-version@v4.0.2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: tag
+        uses: paulhatch/semantic-version@v4.0.2
         with:
           tag_prefix: "v"
           major_pattern: "(MAJOR)"
@@ -17,7 +22,5 @@ jobs:
           format: "${major}.${minor}.${patch}"
           short_tags: false
           bump_each_commit: false
-          search_commit_body: true
-          user_format_type: "json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
