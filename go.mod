@@ -1,6 +1,6 @@
 module github.com/kenji-yamane/mgr8
 
-go 1.17.6
+go 1.17
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
