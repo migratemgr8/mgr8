@@ -1,9 +1,6 @@
-name: tag
+name: pr
 
-on:
-  pull_request:
-    branches:
-      - *
+on: [pull_request]
 
 jobs:
   build-and-test:
