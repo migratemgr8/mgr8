@@ -25,13 +25,7 @@ jobs:
           bump_each_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create tag
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ steps.tag_generator.outputs.version_tag }}',
-              sha: context.sha
-            })
+      - name: git
+        run: |
+          git tag ${{ steps.tag_generator.outputs.version_tag }}
+          git push origin --tags
