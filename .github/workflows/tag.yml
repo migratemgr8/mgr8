@@ -3,7 +3,7 @@ name: tag
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   release:
