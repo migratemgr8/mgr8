@@ -28,6 +28,7 @@ func Execute() {
 		Short: "apply runs migrations in the selected database",
 		Run: applyCommand.Execute,
 	}
+	applyCmd.Flags().StringVar(&applyCommand.Database, "database", "", "Database URL")
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(applyCmd)
 

@@ -13,7 +13,7 @@ import (
 var defaultDriver = "postgres"
 
 type apply struct {
-
+	Database string
 }
 
 func (a *apply) Execute(cmd *cobra.Command, args []string){
@@ -36,9 +36,13 @@ func (a *apply) Execute(cmd *cobra.Command, args []string){
 	}
 
 	statements := strings.Split(string(content), ";")
-	err = driver.Execute(statements)
+	err = driver.Execute(a.Database, statements)
 	if err != nil {
 		log.Fatal("could not execute transaction")
 	}
+
+}
+
+func (a *apply) applyMigrationScript(scriptName string){
 
 }

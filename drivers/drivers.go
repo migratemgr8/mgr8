@@ -7,7 +7,7 @@ import (
 )
 
 type Driver interface {
-	Execute(statements []string) error
+	Execute(db string, statements []string) error
 }
 
 func GetDriver(driverName string) (Driver, error) {

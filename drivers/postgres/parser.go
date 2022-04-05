@@ -14,8 +14,8 @@ func NewPostgresDriver() *postgresDriver{
 	return &postgresDriver{}
 }
 
-func (p *postgresDriver) Execute(statements []string) error{
-	db, err := sqlx.Connect("postgres", "user=root dbname=core password=root sslmode=disable")
+func (p *postgresDriver) Execute(url string, statements []string) error{
+	db, err := sqlx.Connect("postgres", url)
 	if err != nil {
 		log.Fatalln(err)
 	}
