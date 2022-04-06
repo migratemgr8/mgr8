@@ -7,9 +7,14 @@ import (
 )
 
 type Driver interface {
-	Execute(statements []string) error
 	Begin(url string) error
 	Commit() error
+
+	Execute(statements []string) error
+	GetLatestMigration() (int, error)
+	UpdateLatestMigration(int) error
+	CreateBaseTable() error
+	HasBaseTable() (bool, error)
 }
 
 func GetDriver(driverName string) (Driver, error) {
