@@ -7,8 +7,7 @@ import (
 )
 
 type Driver interface {
-	Begin(url string) error
-	Commit() error
+	ExecuteTransaction(url string, f func() error) error
 
 	Execute(statements []string) error
 	GetLatestMigration() (int, error)

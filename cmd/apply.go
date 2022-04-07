@@ -28,60 +28,90 @@ func (a *apply) Execute(cmd *cobra.Command, args []string) {
 		driverName = args[1]
 	}
 
+	err := a.execute(folderName, driverName)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (a *apply) execute(folderName, driverName string) error {
 	driver, err := drivers.GetDriver(driverName)
 	if err != nil {
-		log.Fatalf(err.Error())
+		return err
 	}
 
 	fmt.Printf("Driver %s started\n", driverName)
 
-	err = driver.Begin(a.Database)
-	if err != nil {
-		log.Fatalf("could not connect to database: %s", err)
-	}
-
-	hasTables, err := driver.HasBaseTable()
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	if !hasTables {
-		fmt.Printf("Installing mgr8 into the database...\n")
-		err := driver.CreateBaseTable()
+	return driver.ExecuteTransaction(a.Database, func() error {
+		previousMigrationNumber, err := a.getPreviousMigrationNumber(driver)
 		if err != nil {
-			log.Fatalf(err.Error())
+			return err
 		}
-	}
 
-	previousMigrationNumber, err := driver.GetLatestMigration()
-	if err != nil {
-		log.Fatalf("%s", err)
-	}
+		latestMigrationNumber, err := a.runFolderMigrations(folderName, previousMigrationNumber, driver)
+		if err != nil {
+			return err
+		}
 
+		if latestMigrationNumber <= previousMigrationNumber {
+			return nil
+		}
+
+		return driver.UpdateLatestMigration(latestMigrationNumber)
+	})
+}
+
+func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber int, driver drivers.Driver) (int, error) {
 	latestMigrationNumber := 0
-	items, _ := ioutil.ReadDir(folderName)
+	items, err := ioutil.ReadDir(folderName)
+	if err != nil {
+		return 0, err
+	}
+
 	for _, item := range items {
 		itemMigrationNumber, err := a.getMigrationNumber(item.Name())
 		if err != nil {
 			continue
 		}
-		if itemMigrationNumber <= previousMigrationNumber {
-			continue
-		}
 		if itemMigrationNumber > latestMigrationNumber {
 			latestMigrationNumber = itemMigrationNumber
 		}
-		a.applyMigrationScript(driver, path.Join(folderName, item.Name()))
+		if itemMigrationNumber <= previousMigrationNumber {
+			continue
+		}
+		err = a.applyMigrationScript(driver, path.Join(folderName, item.Name()))
+		if err != nil {
+			return 0, err
+		}
+	}
+	return latestMigrationNumber, nil
+}
+
+func (a *apply) getPreviousMigrationNumber(driver drivers.Driver) (int, error) {
+	hasTables, err := driver.HasBaseTable()
+	if err != nil {
+		return 0, err
+	}
+	if hasTables {
+		return driver.GetLatestMigration()
+	}
+	fmt.Printf("Installing mgr8 into the database...\n")
+	return 0, driver.CreateBaseTable()
+}
+
+func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) error {
+	fmt.Printf("Applying file %s\n", scriptName)
+	content, err := os.ReadFile(scriptName)
+	if err != nil {
+		return fmt.Errorf("could not read from file: %s", err)
 	}
 
-	err = driver.UpdateLatestMigration(latestMigrationNumber)
+	statements := strings.Split(string(content), ";")
+	err = driver.Execute(statements)
 	if err != nil {
-		log.Fatalf("%s", err)
+		return fmt.Errorf("could not execute transaction: %s", err)
 	}
-
-	err = driver.Commit()
-	if err != nil {
-		log.Fatalf("could not commit transaction: %s", err)
-	}
+	return nil
 }
 
 func (a *apply) getMigrationNumber(itemName string) (int, error) {
@@ -92,18 +122,4 @@ func (a *apply) getMigrationNumber(itemName string) (int, error) {
 		return 0, err
 	}
 	return migrationVersion, nil
-}
-
-func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) {
-	fmt.Printf("Applying file %s\n", scriptName)
-	content, err := os.ReadFile(scriptName)
-	if err != nil {
-		log.Fatal("could not read from file")
-	}
-
-	statements := strings.Split(string(content), ";")
-	err = driver.Execute(statements)
-	if err != nil {
-		log.Fatalf("could not execute transaction: %s", err)
-	}
 }

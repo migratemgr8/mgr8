@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
@@ -30,7 +29,7 @@ func (p *postgresDriver) Execute(statements []string) error {
 	return nil
 }
 
-func (p *postgresDriver) Begin(url string) error {
+func (p *postgresDriver) ExecuteTransaction(url string, f func() error) error {
 	db, err := sqlx.Connect("postgres", url)
 	if err != nil {
 		log.Fatalln(err)
@@ -42,13 +41,16 @@ func (p *postgresDriver) Begin(url string) error {
 	}
 
 	p.tx = tx
-	return nil
-}
 
-func (p *postgresDriver) Commit() error {
-	if p.tx == nil {
-		return fmt.Errorf("no transaction running")
+	err = f()
+	if err != nil {
+		err2 := p.tx.Rollback()
+		if err2 != nil {
+			return err2
+		}
+		return err
 	}
+
 	return p.tx.Commit()
 }
 
