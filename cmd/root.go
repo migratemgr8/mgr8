@@ -29,7 +29,8 @@ func Execute() {
 		Run:   applyCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
-	applyCmd.Flags().StringVar(&applyCommand.Database, "database", "", "Database URL")
+
+	applyCmd.Flags().StringVar(&applyCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(applyCmd)
 
