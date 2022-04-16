@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/kenji-yamane/mgr8/applications"
 )
 
 var defaultDriver = "postgres"
@@ -57,7 +58,7 @@ func (a *apply) execute(folderName, driverName string) error {
 			return nil
 		}
 
-		return driver.UpdateLatestMigration(latestMigrationNumber)
+		return err
 	})
 }
 
@@ -67,6 +68,15 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 	if err != nil {
 		return 0, err
 	}
+
+	username_service := applications.NewUserNameService()
+	username, err := username_service.GetUserName()
+	if err != nil {
+		return 0, err
+	}
+	fmt.Println("User detected: " + username)
+
+	hash_service := applications.NewHashService()
 
 	for _, item := range items {
 		itemMigrationNumber, err := a.getMigrationNumber(item.Name())
@@ -80,6 +90,14 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 			continue
 		}
 		err = a.applyMigrationScript(driver, path.Join(folderName, item.Name()))
+		if err != nil {
+			return 0, err
+		}
+		hash, err := hash_service.GetSqlHash(path.Join(folderName, item.Name()))
+		if err != nil {
+			return 0, err
+		}
+		err = driver.InsertLatestMigration(latestMigrationNumber, username, hash)
 		if err != nil {
 			return 0, err
 		}
