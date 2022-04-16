@@ -8,11 +8,12 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
-	"github.com/kenji-yamane/mgr8/drivers"
 	"github.com/kenji-yamane/mgr8/applications"
+	"github.com/kenji-yamane/mgr8/drivers"
 )
 
 var defaultDriver = "postgres"
@@ -93,11 +94,13 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 		if err != nil {
 			return 0, err
 		}
+		currentDate := time.Now().Format("2006-01-02 15:04:05")
+
 		hash, err := hash_service.GetSqlHash(path.Join(folderName, item.Name()))
 		if err != nil {
 			return 0, err
 		}
-		err = driver.InsertLatestMigration(latestMigrationNumber, username, hash)
+		err = driver.InsertLatestMigration(latestMigrationNumber, username, currentDate, hash)
 		if err != nil {
 			return 0, err
 		}

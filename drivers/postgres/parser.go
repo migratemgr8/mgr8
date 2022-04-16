@@ -2,9 +2,10 @@ package postgres
 
 import (
 	"database/sql"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 type postgresDriver struct {
@@ -63,8 +64,8 @@ func (p *postgresDriver) GetLatestMigration() (int, error) {
 	return version, nil
 }
 
-func (p *postgresDriver) InsertLatestMigration(version int, username string, hash string) error {
-	_, err := p.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, NOW(), $3)`, version, username, hash)
+func (p *postgresDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
+	_, err := p.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
 	return err
 }
 
@@ -81,14 +82,14 @@ func (p *postgresDriver) HasBaseTable() (bool, error) {
 }
 
 func (p *postgresDriver) CreateBaseTable() error {
-	_, err := p.tx.Exec(`CREATE TABLE migration_log( version INTEGER, username VARCHAR(32), date TIMESTAMPTZ, hash VARCHAR(32) )`)
+	_, err := p.tx.Exec(`CREATE TABLE migration_log( version INTEGER, username VARCHAR(32), date VARCHAR(32), hash VARCHAR(32) )`)
 	if err != nil {
 		return err
 	}
-	
-	_, err = p.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES (0, 'InitialSetup', NOW(), '-') `)
-	if err != nil {
-		return err
-	}
+
+	//_, err = p.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES (0, 'InitialSetup', NOW(), '-') `)
+	//if err != nil {
+	//	return err
+	//}
 	return err
 }
