@@ -2,7 +2,7 @@ package domain
 
 type Schema struct {
 	Tables map[string]*Table
-	Views map[string]*View
+	Views  map[string]*View
 }
 
 type Table struct {
@@ -10,10 +10,11 @@ type Table struct {
 }
 
 type Column struct {
-	Datatype string
+	Datatype   string
+	Parameters map[string]interface{}
+	IsNotNull  bool
 }
 
 type View struct {
 	SQL string
 }
-
