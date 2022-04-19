@@ -25,8 +25,13 @@ var _ = Describe("Postgres Driver", func() {
 					phone VARCHAR(11),
 					name VARCHAR(15),
 					age INTEGER,
-					size INT
-				);`
+					size INT,
+					ddi VARCHAR(3)
+				);
+
+				CREATE VIEW user_numbers AS
+				SELECT name, CONCAT(ddi, phone) FROM users;`
+
 				schema, err := subject.ParseMigration(migration)
 				Expect(err).To(BeNil())
 				Expect(schema).To(Equal(&domain.Schema{
@@ -36,12 +41,15 @@ var _ = Describe("Postgres Driver", func() {
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},
 								"name":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(15)}},
+								"ddi":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
 								"age":           {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
 								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
 							},
 						},
 					},
-					Views: nil,
+					Views: map[string]*domain.View{
+						"user_numbers": {SQL: ""},
+					},
 				}))
 			})
 		})

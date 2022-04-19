@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -104,15 +105,26 @@ func (p *postgresDriver) ParseMigration(scriptFile string) (*domain.Schema, erro
 	}
 
 	tables := make(map[string]*domain.Table)
+	views := make(map[string]*domain.View)
 	for _, statement := range result.Stmts {
-		parsedStatement := statement.Stmt.GetCreateStmt()
-		tableName := parsedStatement.Relation.Relname
-		tables[tableName] = p.parseTable(parsedStatement)
+		log.Print(statement.Stmt.String())
+		switch statement.Stmt.Node.(type){
+		case *pg_query.Node_CreateStmt:
+			parsedStatement := statement.Stmt.GetCreateStmt()
+			tableName := parsedStatement.Relation.Relname
+			tables[tableName] = p.parseTable(parsedStatement)
+		case *pg_query.Node_ViewStmt:
+			parsedStatement := statement.Stmt.GetViewStmt()
+			viewName := parsedStatement.View.Relname
+			views[viewName] = p.parseView(parsedStatement)
+		default:
+			return nil, fmt.Errorf("found an unsuported statement:\n %s", statement.Stmt.String())
+		}
 	}
 
 	return &domain.Schema{
 		Tables: tables,
-		Views:  nil,
+		Views:  views,
 	}, nil
 }
 
@@ -124,6 +136,12 @@ func (p *postgresDriver) parseTable(parsedStatement *pg_query.CreateStmt) *domai
 	}
 	return &domain.Table{
 		Columns: columns,
+	}
+}
+func (p *postgresDriver) parseView(parsedStatement *pg_query.ViewStmt) *domain.View {
+	// TODO
+	return &domain.View{
+		SQL: "",
 	}
 }
 
