@@ -29,8 +29,8 @@ var _ = Describe("Postgres Driver", func() {
 					ddi VARCHAR(3)
 				);
 
-				CREATE VIEW user_numbers AS
-				SELECT name, CONCAT(ddi, phone) FROM users;`
+				CREATE VIEW user_phones AS
+				SELECT name, CONCAT(ddi, phone) AS full_phone FROM users;`
 
 				schema, err := subject.ParseMigration(migration)
 				Expect(err).To(BeNil())
@@ -48,7 +48,7 @@ var _ = Describe("Postgres Driver", func() {
 						},
 					},
 					Views: map[string]*domain.View{
-						"user_numbers": {SQL: ""},
+						"user_phones": {SQL: ""},
 					},
 				}))
 			})
