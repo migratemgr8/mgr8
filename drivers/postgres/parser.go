@@ -107,7 +107,6 @@ func (p *postgresDriver) ParseMigration(scriptFile string) (*domain.Schema, erro
 	tables := make(map[string]*domain.Table)
 	views := make(map[string]*domain.View)
 	for _, statement := range result.Stmts {
-		log.Print(statement.Stmt.String())
 		switch statement.Stmt.Node.(type){
 		case *pg_query.Node_CreateStmt:
 			parsedStatement := statement.Stmt.GetCreateStmt()
