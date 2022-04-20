@@ -1,4 +1,5 @@
 builds:
 
-    ignore:
-      - goos: arm
+    goarch:
+      - 386
+      - amd64
