@@ -3,6 +3,7 @@ package drivers
 import (
 	"fmt"
 
+	"github.com/kenji-yamane/mgr8/domain"
 	"github.com/kenji-yamane/mgr8/drivers/postgres"
 )
 
@@ -14,6 +15,8 @@ type Driver interface {
 	InsertLatestMigration(int, string, string, string) error
 	CreateBaseTable() error
 	HasBaseTable() (bool, error)
+
+	ParseMigration(scriptFile string) (*domain.Schema, error)
 }
 
 func GetDriver(driverName string) (Driver, error) {

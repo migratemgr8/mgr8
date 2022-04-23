@@ -1,0 +1,5 @@
+builds:
+  -
+    targets:
+      - linux_amd64
+      - darwin_amd64

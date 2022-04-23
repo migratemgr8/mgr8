@@ -16,9 +16,11 @@ func Execute() {
                 sbrubbles`,
 	}
 
+	generateCommand := generate{}
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "generate creates migration script based on the diff between schema versions",
+		Run:   generateCommand.Execute,
 	}
 
 	applyCommand := apply{}
