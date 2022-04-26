@@ -3,10 +3,13 @@ package mysql
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kenji-yamane/mgr8/domain"
+
+	"database/sql"
+	"log"
 )
 
 type mySqlDriver struct {
-	tx *sqlx.Tx
+	tx *sql.Tx
 }
 
 func NewMySqlDriver() *mySqlDriver {
@@ -28,23 +31,67 @@ func (d *mySqlDriver) Execute(statements []string) error {
 }
 
 func (d *mySqlDriver) ExecuteTransaction(url string, f func() error) error {
-	return nil
+	db, err := sqlx.Connect("mysql", url)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	d.tx = tx
+
+	err = f()
+	if err != nil {
+		err2 := d.tx.Rollback()
+		if err2 != nil {
+			return err2
+		}
+		return err
+	}
+
+	return d.tx.Commit()
 }
 
 func (d *mySqlDriver) GetLatestMigration() (int, error) {
-	return 0, nil
+	var version int
+	err := d.tx.QueryRow(`SELECT version FROM migration_log ORDER BY version DESC LIMIT 1`).Scan(&version)
+	if err != nil {
+		return 0, err
+	}
+	return version, nil
 }
 
 func (d *mySqlDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
-	return nil
-}
-
-func (d *mySqlDriver) CreateBaseTable() error {
-	return nil
+	_, err := d.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
+	return err
 }
 
 func (d *mySqlDriver) HasBaseTable() (bool, error) {
-	return false, nil
+	var installed bool
+	err := d.tx.QueryRow(`
+		SELECT COUNT(*) FROM information_schema.tables 
+	    WHERE table_name = 'migration_log'`).Scan(&installed)
+	if err != nil {
+		return false, err
+	}
+	return installed, err
+}
+
+func (d *mySqlDriver) CreateBaseTable() error {
+	_, err := d.tx.Exec(`
+		CREATE TABLE migration_log(
+			version INTEGER,
+			username VARCHAR(32),
+			date VARCHAR(32),
+			hash VARCHAR(32)
+	  	)`)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 func (d *mySqlDriver) ParseMigration(scriptFile string) (*domain.Schema, error) {
