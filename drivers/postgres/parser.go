@@ -78,8 +78,8 @@ func (d *postgresDriver) HasBaseTable() (bool, error) {
 	var installed bool
 	err := d.tx.QueryRow(`SELECT EXISTS (
 	   SELECT FROM information_schema.tables 
-	   WHERE  table_name   = 'migration_log'
-	   )`).Scan(&installed)
+	   WHERE  table_name   = $1
+	   )`, domain.LogsTableName).Scan(&installed)
 	if err != nil {
 		return false, err
 	}

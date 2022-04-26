@@ -76,7 +76,7 @@ func (d *mySqlDriver) HasBaseTable() (bool, error) {
 	var installed bool
 	err := d.tx.QueryRow(`
 		SELECT COUNT(*) FROM information_schema.tables 
-	    WHERE table_name = 'migration_log'`).Scan(&installed)
+	    WHERE table_name = ?`, domain.LogsTableName).Scan(&installed)
 	if err != nil {
 		return false, err
 	}
