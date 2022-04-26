@@ -24,8 +24,14 @@ docker compose up <database_name>
 
 Available databases: postgres
 
-### Run migrations
+### Snippets
 
+Executing migrations with postgres driver
 ```bash
 ./bin/mgr8 apply --database=postgres://root:root@localhost:5432/core?sslmode=disable ./migrations
+```
+
+Executing migrations with mysql driver
+```bash
+./bin/mgr8 apply --database=root:root@tcp\(localhost:3306\)/core ./migrations mysql
 ```
