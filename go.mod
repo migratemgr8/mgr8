@@ -11,6 +11,7 @@ require (
 require github.com/pganalyze/pg_query_go/v2 v2.1.0
 
 require (
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.19.0
 )

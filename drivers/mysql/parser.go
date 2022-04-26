@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/kenji-yamane/mgr8/domain"
 
@@ -65,7 +66,9 @@ func (d *mySqlDriver) GetLatestMigration() (int, error) {
 }
 
 func (d *mySqlDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
-	_, err := d.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
+	_, err := d.tx.Exec(
+		`INSERT INTO migration_log (version, username, date, hash) VALUES (?, ?, ?, ?)`,
+		version, username, currentDate, hash)
 	return err
 }
 
