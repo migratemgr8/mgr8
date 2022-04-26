@@ -21,10 +21,11 @@ type Driver interface {
 }
 
 func GetDriver(driverName string) (Driver, error) {
-	switch driverName {
-	case "postgres":
+	driver := domain.Driver(driverName)
+	switch driver {
+	case domain.Postgres:
 		return postgres.NewPostgresDriver(), nil
-	case "mysql":
+	case domain.MySql:
 		return mysql.NewMySqlDriver(), nil
 	}
 	return nil, fmt.Errorf("inexistent driver %s", driverName)
