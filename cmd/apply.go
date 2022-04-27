@@ -127,12 +127,22 @@ func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) e
 		return fmt.Errorf("could not read from file: %s", err)
 	}
 
-	statements := strings.Split(string(content), ";")
+	statements := a.filterNonEmpty(strings.Split(string(content), ";"))
 	err = driver.Execute(statements)
 	if err != nil {
 		return fmt.Errorf("could not execute transaction: %s", err)
 	}
 	return nil
+}
+
+func (a *apply) filterNonEmpty(statements []string) []string {
+	filtered := make([]string, 0)
+	for _, s := range statements {
+		if strings.TrimSpace(s) != "" {
+			filtered = append(filtered, s)
+		}
+	}
+	return filtered
 }
 
 func (a *apply) getMigrationNumber(itemName string) (int, error) {

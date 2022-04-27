@@ -11,3 +11,11 @@ services:
     ports:
       - "5432:5432/tcp"
     restart: always
+  mysql:
+    image: mysql:8.0-debian
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: core
+    ports:
+      - "3306:3306/tcp"
+    restart: always
