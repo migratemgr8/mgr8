@@ -16,25 +16,23 @@ func Execute() {
                 sbrubbles`,
 	}
 
-	generateCommand := generate{}
+	generateCommand := DatabaseCmd{cmd: &generate{}}
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "generate creates migration script based on the diff between schema versions",
 		Run:   generateCommand.Execute,
 	}
 
-	applyCommand := apply{}
-
+	applyCommand := DatabaseCmd{cmd: &apply{}}
 	applyCmd := &cobra.Command{
 		Use:   "apply",
 		Short: "apply runs migrations in the selected database",
 		Run:   applyCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
-
 	applyCmd.Flags().StringVar(&applyCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
-	rootCmd.AddCommand(generateCmd)
-	rootCmd.AddCommand(applyCmd)
+
+	rootCmd.AddCommand(applyCmd, generateCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

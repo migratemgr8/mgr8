@@ -3,48 +3,20 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/spf13/cobra"
-
 	"github.com/kenji-yamane/mgr8/applications"
 	"github.com/kenji-yamane/mgr8/drivers"
 )
 
-var defaultDriver = "postgres"
+type apply struct{}
 
-type apply struct {
-	Database string
-}
-
-func (a *apply) Execute(cmd *cobra.Command, args []string) {
-	folderName := args[0]
-
-	driverName := defaultDriver
-	if len(args) > 1 {
-		driverName = args[1]
-	}
-
-	err := a.execute(folderName, driverName)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (a *apply) execute(folderName, driverName string) error {
-	driver, err := drivers.GetDriver(driverName)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Driver %s started\n", driverName)
-
-	return driver.ExecuteTransaction(a.Database, func() error {
+func (a *apply) execute(folderName, database string, driver drivers.Driver) error {
+	return driver.ExecuteTransaction(database, func() error {
 		previousMigrationNumber, err := a.getPreviousMigrationNumber(driver)
 		if err != nil {
 			return err
