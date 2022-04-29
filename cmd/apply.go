@@ -49,7 +49,10 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 	fmt.Println("User detected: " + username)
 
 	for _, item := range items {
-		itemMigrationNumber, err := applications.GetMigrationNumber(item.Name())
+		fileName := item.Name()
+		fullName := path.Join(folderName, fileName)
+
+		itemMigrationNumber, err := applications.GetMigrationNumber(fileName)
 		if err != nil {
 			continue
 		}
@@ -57,15 +60,22 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 			latestMigrationNumber = itemMigrationNumber
 		}
 		if itemMigrationNumber <= previousMigrationNumber {
+			valid, err := validateFileMigration(itemMigrationNumber, fullName, driver)
+			if err != nil {
+				return 0, err
+			}
+			if !valid {
+				return 0, fmt.Errorf("❌ invalid migration file %s", fileName)
+			}
 			continue
 		}
-		err = a.applyMigrationScript(driver, path.Join(folderName, item.Name()))
+		err = a.applyMigrationScript(driver, fullName)
 		if err != nil {
 			return 0, err
 		}
 		currentDate := time.Now().Format("2006-01-02 15:04:05")
 
-		hash, err := applications.GetSqlHash(path.Join(folderName, item.Name()))
+		hash, err := applications.GetSqlHash(fullName)
 		if err != nil {
 			return 0, err
 		}
