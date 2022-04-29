@@ -32,7 +32,16 @@ func Execute() {
 	}
 	applyCmd.Flags().StringVar(&applyCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
 
-	rootCmd.AddCommand(applyCmd, generateCmd)
+	validateCommand := DatabaseCmd{cmd: &validate{}}
+	validateCmd := &cobra.Command{
+		Use:   "validate",
+		Short: "validate compares migrations sql scripts against hashing ",
+		Run:   validateCommand.Execute,
+		Args:  cobra.MinimumNArgs(1),
+	}
+	validateCmd.Flags().StringVar(&validateCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
+
+	rootCmd.AddCommand(applyCmd, generateCmd, validateCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

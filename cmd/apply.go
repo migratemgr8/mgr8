@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -17,7 +16,7 @@ type apply struct{}
 
 func (a *apply) execute(folderName, database string, driver drivers.Driver) error {
 	return driver.ExecuteTransaction(database, func() error {
-		previousMigrationNumber, err := a.getPreviousMigrationNumber(driver)
+		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
 			return err
 		}
@@ -49,10 +48,8 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 	}
 	fmt.Println("User detected: " + username)
 
-	hash_service := applications.NewHashService()
-
 	for _, item := range items {
-		itemMigrationNumber, err := a.getMigrationNumber(item.Name())
+		itemMigrationNumber, err := applications.GetMigrationNumber(item.Name())
 		if err != nil {
 			continue
 		}
@@ -68,7 +65,7 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 		}
 		currentDate := time.Now().Format("2006-01-02 15:04:05")
 
-		hash, err := hash_service.GetSqlHash(path.Join(folderName, item.Name()))
+		hash, err := applications.GetSqlHash(path.Join(folderName, item.Name()))
 		if err != nil {
 			return 0, err
 		}
@@ -80,18 +77,6 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 	return latestMigrationNumber, nil
 }
 
-func (a *apply) getPreviousMigrationNumber(driver drivers.Driver) (int, error) {
-	hasTables, err := driver.HasBaseTable()
-	if err != nil {
-		return 0, err
-	}
-	if hasTables {
-		return driver.GetLatestMigration()
-	}
-	fmt.Printf("Installing mgr8 into the database...\n")
-	return 0, driver.CreateBaseTable()
-}
-
 func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) error {
 	fmt.Printf("Applying file %s\n", scriptName)
 	content, err := os.ReadFile(scriptName)
@@ -99,7 +84,7 @@ func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) e
 		return fmt.Errorf("could not read from file: %s", err)
 	}
 
-	statements := a.filterNonEmpty(strings.Split(string(content), ";"))
+	statements := FilterNonEmpty(strings.Split(string(content), ";"))
 	err = driver.Execute(statements)
 	if err != nil {
 		return fmt.Errorf("could not execute transaction: %s", err)
@@ -107,7 +92,7 @@ func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) e
 	return nil
 }
 
-func (a *apply) filterNonEmpty(statements []string) []string {
+func FilterNonEmpty(statements []string) []string {
 	filtered := make([]string, 0)
 	for _, s := range statements {
 		if strings.TrimSpace(s) != "" {
@@ -115,14 +100,4 @@ func (a *apply) filterNonEmpty(statements []string) []string {
 		}
 	}
 	return filtered
-}
-
-func (a *apply) getMigrationNumber(itemName string) (int, error) {
-	itemNameParts := strings.Split(itemName, "_")
-	migrationVersionStr := itemNameParts[0]
-	migrationVersion, err := strconv.Atoi(migrationVersionStr)
-	if err != nil {
-		return 0, err
-	}
-	return migrationVersion, nil
 }
