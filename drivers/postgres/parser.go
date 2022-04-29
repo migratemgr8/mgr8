@@ -69,6 +69,15 @@ func (d *postgresDriver) GetLatestMigration() (int, error) {
 	return version, nil
 }
 
+func (d *postgresDriver) GetVersionHashing(version int) (string, error) {
+	var hash string
+	err := d.tx.QueryRow(`SELECT hash FROM migration_log WHERE version = $1 LIMIT 1`, version).Scan(&hash)
+	if err != nil {
+		return ``, err
+	}
+	return hash, nil
+}
+
 func (d *postgresDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
 	_, err := d.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
 	return err
@@ -103,7 +112,7 @@ func (d *postgresDriver) ParseMigration(scriptFile string) (*domain.Schema, erro
 	tables := make(map[string]*domain.Table)
 	views := make(map[string]*domain.View)
 	for _, statement := range result.Stmts {
-		switch statement.Stmt.Node.(type){
+		switch statement.Stmt.Node.(type) {
 		case *pg_query.Node_CreateStmt:
 			parsedStatement := statement.Stmt.GetCreateStmt()
 			tableName := parsedStatement.Relation.Relname

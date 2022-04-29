@@ -13,6 +13,7 @@ type Driver interface {
 
 	Execute(statements []string) error
 	GetLatestMigration() (int, error)
+	GetVersionHashing(version int) (string, error)
 	InsertLatestMigration(int, string, string, string) error
 	CreateBaseTable() error
 	HasBaseTable() (bool, error)
