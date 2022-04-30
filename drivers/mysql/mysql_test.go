@@ -1,9 +1,10 @@
 package mysql
 
 import (
-	"github.com/kenji-yamane/mgr8/domain"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/kenji-yamane/mgr8/domain"
 )
 
 var _ = Describe("MySql Driver", func() {
@@ -33,17 +34,17 @@ var _ = Describe("MySql Driver", func() {
 
 				schema, err := subject.ParseMigration(migration)
 				Expect(err).To(BeNil())
-				Expect(schema)
+				Expect(schema).To(Not(BeNil()))
 				Expect(schema).To(Equal(&domain.Schema{
 					Tables: map[string]*domain.Table{
 						"users": {
 							Columns: map[string]*domain.Column{
-								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 9}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 11}},
+								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 9}},
 								"name":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 15}},
 								"age":           {Datatype: "int", IsNotNull: false, Parameters: map[string]interface{}{}},
 								"size":          {Datatype: "int", IsNotNull: false, Parameters: map[string]interface{}{}},
-								"ddi":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 3}},
+								"ddi":           {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 3}},
 							},
 						},
 					},

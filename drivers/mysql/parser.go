@@ -178,9 +178,11 @@ func (d *mySqlDriver) ParseMigration(scriptFile string) (*domain.Schema, error) 
 
 	e := &extractor{
 		tables: make(map[string]*domain.Table),
-		views: make(map[string]*domain.View),
+		views:  make(map[string]*domain.View),
 	}
-	stmtNodes[0].Accept(e)
+	for _, n := range stmtNodes {
+		n.Accept(e)
+	}
 	return &domain.Schema{
 		Tables: e.tables,
 		Views:  e.views,
