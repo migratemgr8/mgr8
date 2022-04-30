@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"github.com/pingcap/parser/mysql"
+	"github.com/pingcap/parser/types"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -158,7 +159,7 @@ func (x *extractor) parseColumn(col *ast.ColumnDef) *domain.Column {
 	}
 
 	return &domain.Column{
-		Datatype:   col.Tp.String(),
+		Datatype:   types.TypeStr(col.Tp.Tp),
 		Parameters: parameters,
 		IsNotNull:  isNotNull,
 	}
