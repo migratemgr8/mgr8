@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/pingcap/parser/mysql"
 	"log"
 
@@ -109,17 +108,18 @@ type Visitor interface {
 }
 
 type extractor struct {
-	colNames []string
-	expressions []string
-	tNames []string
+	tables map[string]*domain.Table
+	views  map[string]*domain.View
 }
 
 func (x *extractor) Enter(in ast.Node) (ast.Node, bool) {
-	tables := make(map[string]*domain.Table)
 	switch in.(type) {
 	case *ast.CreateTableStmt:
 		createStmt := in.(*ast.CreateTableStmt)
-		tables[createStmt.Table.Name.O] = x.parseTable(createStmt)
+		x.tables[createStmt.Table.Name.O] = x.parseTable(createStmt)
+	case *ast.CreateViewStmt:
+		createStmt := in.(*ast.CreateViewStmt)
+		x.views[createStmt.ViewName.Name.O] = x.parseView(createStmt)
 	}
 	return in, false
 }
@@ -132,6 +132,13 @@ func (x *extractor) parseTable(stmt *ast.CreateTableStmt) *domain.Table {
 	}
 	return &domain.Table{
 		Columns: columns,
+	}
+}
+
+func (x *extractor) parseView(stmt *ast.CreateViewStmt) *domain.View {
+	// TODO
+	return &domain.View{
+		SQL: "",
 	}
 }
 
@@ -151,9 +158,9 @@ func (x *extractor) parseColumn(col *ast.ColumnDef) *domain.Column {
 	}
 
 	return &domain.Column{
-		Datatype: col.Tp.String(),
+		Datatype:   col.Tp.String(),
 		Parameters: parameters,
-		IsNotNull: isNotNull,
+		IsNotNull:  isNotNull,
 	}
 }
 
@@ -168,8 +175,13 @@ func (d *mySqlDriver) ParseMigration(scriptFile string) (*domain.Schema, error) 
 		return nil, err
 	}
 
-	e := &extractor{}
+	e := &extractor{
+		tables: make(map[string]*domain.Table),
+		views: make(map[string]*domain.View),
+	}
 	stmtNodes[0].Accept(e)
-	fmt.Println(e.colNames)
-	return &domain.Schema{}, nil
+	return &domain.Schema{
+		Tables: e.tables,
+		Views:  e.views,
+	}, nil
 }
