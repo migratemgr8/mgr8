@@ -65,6 +65,15 @@ func (d *mySqlDriver) GetLatestMigration() (int, error) {
 	return version, nil
 }
 
+func (d *mySqlDriver) GetVersionHashing(version int) (string, error) {
+	var hash string
+	err := d.tx.QueryRow(`SELECT hash FROM migration_log WHERE version = ? LIMIT 1`, version).Scan(&hash)
+	if err != nil {
+		return ``, err
+	}
+	return hash, nil
+}
+
 func (d *mySqlDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
 	_, err := d.tx.Exec(
 		`INSERT INTO migration_log (version, username, date, hash) VALUES (?, ?, ?, ?)`,
