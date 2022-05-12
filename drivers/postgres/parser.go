@@ -116,7 +116,7 @@ func (d *postgresDriver) ParseMigration(scriptFile string) (*domain.Schema, erro
 		case *pg_query.Node_CreateStmt:
 			parsedStatement := statement.Stmt.GetCreateStmt()
 			tableName := parsedStatement.Relation.Relname
-			tables[tableName] = d.parseTable(parsedStatement)
+			tables[tableName] = d.parseTable(tableName, parsedStatement)
 		case *pg_query.Node_ViewStmt:
 			parsedStatement := statement.Stmt.GetViewStmt()
 			viewName := parsedStatement.View.Relname
@@ -132,13 +132,14 @@ func (d *postgresDriver) ParseMigration(scriptFile string) (*domain.Schema, erro
 	}, nil
 }
 
-func (d *postgresDriver) parseTable(parsedStatement *pg_query.CreateStmt) *domain.Table {
+func (d *postgresDriver) parseTable(tableName string, parsedStatement *pg_query.CreateStmt) *domain.Table {
 	columns := make(map[string]*domain.Column)
 	for _, elts := range parsedStatement.TableElts {
 		columnDefinition := elts.GetColumnDef()
 		columns[columnDefinition.Colname] = d.parseColumn(columnDefinition)
 	}
 	return &domain.Table{
+		Name: tableName,
 		Columns: columns,
 	}
 }

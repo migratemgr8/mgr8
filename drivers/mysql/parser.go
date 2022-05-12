@@ -126,7 +126,7 @@ func (x *extractor) Enter(in ast.Node) (ast.Node, bool) {
 	switch in.(type) {
 	case *ast.CreateTableStmt:
 		createStmt := in.(*ast.CreateTableStmt)
-		x.tables[createStmt.Table.Name.O] = x.parseTable(createStmt)
+		x.tables[createStmt.Table.Name.O] = x.parseTable(createStmt.Table.Name.O, createStmt)
 	case *ast.CreateViewStmt:
 		createStmt := in.(*ast.CreateViewStmt)
 		x.views[createStmt.ViewName.Name.O] = x.parseView(createStmt)
@@ -134,13 +134,14 @@ func (x *extractor) Enter(in ast.Node) (ast.Node, bool) {
 	return in, false
 }
 
-func (x *extractor) parseTable(stmt *ast.CreateTableStmt) *domain.Table {
+func (x *extractor) parseTable(tableName string, stmt *ast.CreateTableStmt) *domain.Table {
 	columns := make(map[string]*domain.Column)
 
 	for _, c := range stmt.Cols {
 		columns[c.Name.Name.O] = x.parseColumn(c)
 	}
 	return &domain.Table{
+		Name: tableName,
 		Columns: columns,
 	}
 }
