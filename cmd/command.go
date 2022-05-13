@@ -10,32 +10,32 @@ import (
 
 var defaultDriver = "postgres"
 
-type DatabaseCommand interface {
+type CommandExecutor interface {
 	execute(pathName, database string, driver drivers.Driver) error
 }
 
-type DatabaseCmd struct {
+type Command struct {
 	driverName string `default:"postgres"`
 	Database   string
-	cmd        DatabaseCommand
+	cmd        CommandExecutor
 }
 
-func (dcmd *DatabaseCmd) Execute(cmd *cobra.Command, args []string) {
+func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	pathName := args[0]
 
-	dcmd.driverName = defaultDriver
+	c.driverName = defaultDriver
 	if len(args) > 1 {
-		dcmd.driverName = args[1]
+		c.driverName = args[1]
 	}
 
-	driver, err := drivers.GetDriver(dcmd.driverName)
+	driver, err := drivers.GetDriver(c.driverName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Driver %s started\n", dcmd.driverName)
+	fmt.Printf("Driver %s started\n", c.driverName)
 
-	err = dcmd.cmd.execute(pathName, dcmd.Database, driver)
+	err = c.cmd.execute(pathName, c.Database, driver)
 	if err != nil {
 		log.Fatal(err)
 	}

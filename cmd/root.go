@@ -16,14 +16,14 @@ func Execute() {
                 sbrubbles`,
 	}
 
-	generateCommand := DatabaseCmd{cmd: &generate{}}
+	generateCommand := Command{cmd: &generate{}}
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "generate creates migration script based on the diff between schema versions",
 		Run:   generateCommand.Execute,
 	}
 
-	applyCommand := DatabaseCmd{cmd: &apply{}}
+	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{
 		Use:   "apply",
 		Short: "apply runs migrations in the selected database",
@@ -32,7 +32,7 @@ func Execute() {
 	}
 	applyCmd.Flags().StringVar(&applyCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
 
-	validateCommand := DatabaseCmd{cmd: &validate{}}
+	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
 		Use:   "validate",
 		Short: "validate compares migrations sql scripts against hashing ",
