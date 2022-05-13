@@ -16,18 +16,13 @@ type CommandExecutor interface {
 }
 
 type Command struct {
-	driverName  string `default:"postgres"`
+	driverName  string
 	databaseURL string
 	cmd         CommandExecutor
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	pathName := args[0]
-
-	c.driverName = defaultDriverName
-	if len(args) > 1 {
-		c.driverName = args[1]
-	}
 
 	driver, err := drivers.GetDriver(c.driverName)
 	if err != nil {

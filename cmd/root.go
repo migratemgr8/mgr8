@@ -31,6 +31,7 @@ func Execute() {
 		Args:  cobra.MinimumNArgs(1),
 	}
 	applyCmd.Flags().StringVar(&applyCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
+	applyCmd.Flags().StringVar(&applyCommand.driverName, "driver", defaultDriverName, "Driver Name")
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
@@ -40,6 +41,7 @@ func Execute() {
 		Args:  cobra.MinimumNArgs(1),
 	}
 	validateCmd.Flags().StringVar(&validateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
+	validateCmd.Flags().StringVar(&validateCommand.driverName, "driver", defaultDriverName, "Driver Name")
 
 	rootCmd.AddCommand(applyCmd, generateCmd, validateCmd)
 
