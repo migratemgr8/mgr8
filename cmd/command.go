@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kenji-yamane/mgr8/domain"
 	"github.com/kenji-yamane/mgr8/drivers"
 	"github.com/spf13/cobra"
 )
 
-var defaultDriver = "postgres"
+var defaultDriver = domain.Postgres
 
 type CommandExecutor interface {
 	execute(pathName, database string, driver drivers.Driver) error
@@ -23,7 +24,7 @@ type Command struct {
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	pathName := args[0]
 
-	c.driverName = defaultDriver
+	c.driverName = string(defaultDriver)
 	if len(args) > 1 {
 		c.driverName = args[1]
 	}
