@@ -22,6 +22,8 @@ func Execute() {
 		Short: "generate creates migration script based on the diff between schema versions",
 		Run:   generateCommand.Execute,
 	}
+	generateCmd.Flags().StringVar(&generateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
+	generateCmd.Flags().StringVar(&generateCommand.driverName, "driver", defaultDriverName, "Driver Name")
 
 	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{
