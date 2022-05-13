@@ -1,42 +1,58 @@
 # mgr8
 
-Agnostic tool that abstracts migration operations
+An agnostic tool that abstracts migration operations
 
-Database URL example: `$DB_TYPE://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable`
+## How to use
 
-Postgres example: `postgres://root:root@localhost:5432/database_name?sslmode=disable`
+### Requirements
 
-### Asdf
+- [Asdf](https://asdf-vm.com/guide/getting-started.html)
+- [Asdf golang plugin](https://github.com/kennyp/asdf-golang)
 
-We recommend using asdf to manage versions. Asdf setup is described [here](https://asdf-vm.com/guide/getting-started.html) and can be summarized as follows:
+### Setup
 
+Make sure you use the project's golang version by running
 ```bash
-# in any folder:
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.0
-. $HOME/.asdf/asdf.sh # ideally, this will be added to ~/.bashrc
-asdf plugin add golang
-
-# in the project folder:
 asdf install
 ```
 
-### Build
+Build project by running
+```bash
+make build
+```
 
-Build with `make build`.
+### Run commands
 
-## How to run
+### Execute migrations
 
-### Open a database
+Execute migrations by running
+```bash
+./bin/mgr8 <migrations_folder> <driver>
+```
+Currently supported drivers: **postgres** and **mysql**.
+<br/>
+Defaults to **postgres**.
+<br/>
+Make sure you either have `DB_HOST` environment variable with you database connection string or you pass it in by using the flag `--database`.
+<br/>
+Example connection string: `postgres://root:root@localhost:5432/database_name?sslmode=disable`
 
-The following command runs a database inside a container. 
+## Develop
 
+### Requirements
+- [Asdf](https://asdf-vm.com/guide/getting-started.html)
+- [Asdf golang plugin](https://github.com/kennyp/asdf-golang)
+- [Docker compose](https://docs.docker.com/compose/install/)
+
+### Run a database container
+
+Run a testing database with
 ```bash
 docker compose up [-d] <database_name> 
 ```
-
 Available databases: postgres, mysql
 
-Passing the `-d` flag is optional will run the container in detached mode, what means it won't block the terminal, but you won't see database logs nor be able to close the container by using ctrl+c.
+Passing the `-d` flag is optional and will run the container in detached mode, it won't block the terminal but you won't see database logs nor be able to close the container by using ctrl+c.
 
 ### Snippets
 
