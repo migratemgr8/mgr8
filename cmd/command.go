@@ -12,13 +12,13 @@ import (
 var defaultDriver = domain.Postgres
 
 type CommandExecutor interface {
-	execute(pathName, database string, driver drivers.Driver) error
+	execute(pathName, databaseURL string, driver drivers.Driver) error
 }
 
 type Command struct {
-	driverName string `default:"postgres"`
-	Database   string
-	cmd        CommandExecutor
+	driverName  string `default:"postgres"`
+	databaseURL string
+	cmd         CommandExecutor
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
@@ -36,7 +36,7 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Driver %s started\n", c.driverName)
 
-	err = c.cmd.execute(pathName, c.Database, driver)
+	err = c.cmd.execute(pathName, c.databaseURL, driver)
 	if err != nil {
 		log.Fatal(err)
 	}

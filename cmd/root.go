@@ -30,7 +30,7 @@ func Execute() {
 		Run:   applyCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
-	applyCmd.Flags().StringVar(&applyCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
+	applyCmd.Flags().StringVar(&applyCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
@@ -39,7 +39,7 @@ func Execute() {
 		Run:   validateCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
-	validateCmd.Flags().StringVar(&validateCommand.Database, "database", os.Getenv("DB_HOST"), "Database URL")
+	validateCmd.Flags().StringVar(&validateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 
 	rootCmd.AddCommand(applyCmd, generateCmd, validateCmd)
 
