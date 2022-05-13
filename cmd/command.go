@@ -12,7 +12,7 @@ import (
 var defaultDriverName = string(domain.DefaultDriver)
 
 type CommandExecutor interface {
-	execute(pathName, databaseURL string, driver drivers.Driver) error
+	execute(args []string, databaseURL string, driver drivers.Driver) error
 }
 
 type Command struct {
@@ -22,8 +22,6 @@ type Command struct {
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
-	pathName := args[0]
-
 	driver, err := drivers.GetDriver(c.driverName)
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +29,7 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Driver %s started\n", c.driverName)
 
-	err = c.cmd.execute(pathName, c.databaseURL, driver)
+	err = c.cmd.execute(args, c.databaseURL, driver)
 	if err != nil {
 		log.Fatal(err)
 	}

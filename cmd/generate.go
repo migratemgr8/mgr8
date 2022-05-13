@@ -9,7 +9,8 @@ import (
 
 type generate struct{}
 
-func (g *generate) execute(fileName, database string, driver drivers.Driver) error {
+func (g *generate) execute(args []string, database string, driver drivers.Driver) error {
+	fileName := args[0]
 	content, err := os.ReadFile(fileName)
 	if err != nil {
 		return fmt.Errorf("could not read from file: %s", err)

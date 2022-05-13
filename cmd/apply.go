@@ -14,7 +14,8 @@ import (
 
 type apply struct{}
 
-func (a *apply) execute(folderName, database string, driver drivers.Driver) error {
+func (a *apply) execute(args []string, database string, driver drivers.Driver) error {
+	folderName := args[0]
 	return driver.ExecuteTransaction(database, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
