@@ -30,3 +30,4 @@ jobs:
           args: release --rm-dist --config build/.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CGO_ENABLED: 1
