@@ -11,8 +11,9 @@ import (
 
 type validate struct{}
 
-func (v *validate) execute(folderName, database string, driver drivers.Driver) error {
-	return driver.ExecuteTransaction(database, func() error {
+func (v *validate) execute(args []string, databaseURL string, driver drivers.Driver) error {
+	folderName := args[0]
+	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
 			return err

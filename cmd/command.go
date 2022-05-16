@@ -4,38 +4,32 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kenji-yamane/mgr8/domain"
 	"github.com/kenji-yamane/mgr8/drivers"
 	"github.com/spf13/cobra"
 )
 
-var defaultDriver = "postgres"
+var defaultDriverName = string(domain.DefaultDriver)
 
-type DatabaseCommand interface {
-	execute(pathName, database string, driver drivers.Driver) error
+type CommandExecutor interface {
+	execute(args []string, databaseURL string, driver drivers.Driver) error
 }
 
-type DatabaseCmd struct {
-	driverName string `default:"postgres"`
-	Database   string
-	cmd        DatabaseCommand
+type Command struct {
+	driverName  string
+	databaseURL string
+	cmd         CommandExecutor
 }
 
-func (dcmd *DatabaseCmd) Execute(cmd *cobra.Command, args []string) {
-	pathName := args[0]
-
-	dcmd.driverName = defaultDriver
-	if len(args) > 1 {
-		dcmd.driverName = args[1]
-	}
-
-	driver, err := drivers.GetDriver(dcmd.driverName)
+func (c *Command) Execute(cmd *cobra.Command, args []string) {
+	driver, err := drivers.GetDriver(c.driverName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Driver %s started\n", dcmd.driverName)
+	fmt.Printf("Driver %s started\n", c.driverName)
 
-	err = dcmd.cmd.execute(pathName, dcmd.Database, driver)
+	err = c.cmd.execute(args, c.databaseURL, driver)
 	if err != nil {
 		log.Fatal(err)
 	}
