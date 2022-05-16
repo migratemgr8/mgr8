@@ -38,6 +38,7 @@ var _ = Describe("MySql Driver", func() {
 				Expect(schema).To(Equal(&domain.Schema{
 					Tables: map[string]*domain.Table{
 						"users": {
+							Name: "users",
 							Columns: map[string]*domain.Column{
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 11}},
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": 9}},

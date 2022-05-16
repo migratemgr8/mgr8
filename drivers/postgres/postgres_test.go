@@ -37,6 +37,7 @@ var _ = Describe("Postgres Driver", func() {
 				Expect(schema).To(Equal(&domain.Schema{
 					Tables: map[string]*domain.Table{
 						"users": {
+							Name: "users",
 							Columns: map[string]*domain.Column{
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},

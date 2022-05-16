@@ -6,7 +6,12 @@ type Schema struct {
 }
 
 type Table struct {
+	Name string
 	Columns map[string]*Column
+}
+
+func NewTable(name string, columns map[string]*Column) *Table {
+	return &Table{Name: name, Columns: columns}
 }
 
 type Column struct {

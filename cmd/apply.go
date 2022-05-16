@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/kenji-yamane/mgr8/applications"
-	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/kenji-yamane/mgr8/domain"
 )
 
 type apply struct{}
 
-func (a *apply) execute(args []string, databaseURL string, driver drivers.Driver) error {
+func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
 	folderName := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
@@ -35,7 +35,7 @@ func (a *apply) execute(args []string, databaseURL string, driver drivers.Driver
 	})
 }
 
-func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber int, driver drivers.Driver) (int, error) {
+func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
 	latestMigrationNumber := 0
 	items, err := ioutil.ReadDir(folderName)
 	if err != nil {
@@ -88,7 +88,7 @@ func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber i
 	return latestMigrationNumber, nil
 }
 
-func (a *apply) applyMigrationScript(driver drivers.Driver, scriptName string) error {
+func (a *apply) applyMigrationScript(driver domain.Driver, scriptName string) error {
 	fmt.Printf("Applying file %s\n", scriptName)
 	content, err := os.ReadFile(scriptName)
 	if err != nil {

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/kenji-yamane/mgr8/domain"
 )
 
 type generate struct{}
 
-func (g *generate) execute(args []string, databaseURL string, driver drivers.Driver) error {
+func (g *generate) execute(args []string, databaseURL string, driver domain.Driver) error {
 	fileName := args[0]
 	content, err := os.ReadFile(fileName)
 	if err != nil {

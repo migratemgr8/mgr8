@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/kenji-yamane/mgr8/domain"
 )
 
-func GetPreviousMigrationNumber(driver drivers.Driver) (int, error) {
+func GetPreviousMigrationNumber(driver domain.Driver) (int, error) {
 	hasTables, err := driver.HasBaseTable()
 
 	if err != nil {
