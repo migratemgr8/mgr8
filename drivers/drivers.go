@@ -8,25 +8,19 @@ import (
 	"github.com/kenji-yamane/mgr8/drivers/postgres"
 )
 
-type Driver interface {
-	ExecuteTransaction(url string, f func() error) error
+type DriverName string
 
-	Execute(statements []string) error
-	GetLatestMigration() (int, error)
-	GetVersionHashing(version int) (string, error)
-	InsertLatestMigration(int, string, string, string) error
-	CreateBaseTable() error
-	HasBaseTable() (bool, error)
+const (
+	MySql         DriverName = "mysql"
+	Postgres      DriverName = "postgres"
+)
 
-	ParseMigration(scriptFile string) (*domain.Schema, error)
-}
-
-func GetDriver(driverName string) (Driver, error) {
-	driver := domain.Driver(driverName)
+func GetDriver(driverName string) (domain.Driver, error) {
+	driver := DriverName(driverName)
 	switch driver {
-	case domain.Postgres:
+	case Postgres:
 		return postgres.NewPostgresDriver(), nil
-	case domain.MySql:
+	case MySql:
 		return mysql.NewMySqlDriver(), nil
 	}
 	return nil, fmt.Errorf("inexistent driver %s", driverName)

@@ -21,6 +21,10 @@ func NewPostgresDriver() *postgresDriver {
 	return &postgresDriver{}
 }
 
+func (d *postgresDriver) Deparser() domain.Deparser{
+	return &deparser{}
+}
+
 func (d *postgresDriver) Execute(statements []string) error {
 	for _, stmt := range statements {
 		_, err := d.tx.Exec(stmt)

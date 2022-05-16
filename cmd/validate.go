@@ -6,12 +6,12 @@ import (
 	"path"
 
 	"github.com/kenji-yamane/mgr8/applications"
-	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/kenji-yamane/mgr8/domain"
 )
 
 type validate struct{}
 
-func (v *validate) execute(args []string, databaseURL string, driver drivers.Driver) error {
+func (v *validate) execute(args []string, databaseURL string, driver domain.Driver) error {
 	folderName := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
@@ -25,7 +25,7 @@ func (v *validate) execute(args []string, databaseURL string, driver drivers.Dri
 	})
 }
 
-func validateFolderMigrations(folderName string, previousMigrationNumber int, driver drivers.Driver) (int, error) {
+func validateFolderMigrations(folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
 	items, err := ioutil.ReadDir(folderName)
 	if err != nil {
 		return 0, err
@@ -55,7 +55,7 @@ func validateFolderMigrations(folderName string, previousMigrationNumber int, dr
 	return 0, nil
 }
 
-func validateFileMigration(version int, fileName string, driver drivers.Driver) (bool, error) {
+func validateFileMigration(version int, fileName string, driver domain.Driver) (bool, error) {
 	hash_file, err := applications.GetSqlHash(fileName)
 	if err != nil {
 		return false, err

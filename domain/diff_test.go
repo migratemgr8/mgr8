@@ -33,7 +33,7 @@ var _ = Describe("Schema Diff", func() {
 				diffQueue := newSchema.Diff(oldSchema)
 				Expect(diffQueue).To(HaveLen(4))
 				Expect(diffQueue).To(ContainElements(
-					NewDropTableDiff("old_table"),
+					NewDropTableDiff(NewTable("old_table", map[string]*Column{})),
 					NewDropColumnDiff("kept_table", "old_column"),
 					NewCreateTableDiff( NewTable("new_table", map[string]*Column{})),
 					NewCreateColumnDiff("kept_table", &Column{}),

@@ -1,6 +1,9 @@
 package domain
 
-type Diff interface{ }
+type Diff interface{
+	Up(driver Deparser) string
+	Down(driver Deparser) string
+}
 
 func (s *Schema) Diff(originalSchema *Schema) []Diff {
 	diffsQueue := []Diff{}
@@ -14,9 +17,9 @@ func (s *Schema) Diff(originalSchema *Schema) []Diff {
 		}
 	}
 
-	for tableName := range originalSchema.Tables {
+	for tableName, table := range originalSchema.Tables {
 		if _, ok := s.Tables[tableName]; !ok {
-			diffsQueue = append(diffsQueue, NewDropTableDiff(tableName))
+			diffsQueue = append(diffsQueue, NewDropTableDiff(table))
 		}
 	}
 

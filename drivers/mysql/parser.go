@@ -23,6 +23,10 @@ func NewMySqlDriver() *mySqlDriver {
 	return &mySqlDriver{}
 }
 
+func (d *mySqlDriver) Deparser() domain.Deparser {
+	return &deparser{}
+}
+
 func (d *mySqlDriver) Execute(statements []string) error {
 	for _, stmt := range statements {
 		_, err := d.tx.Exec(stmt)

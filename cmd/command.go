@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var defaultDriverName = string(domain.DefaultDriver)
+var defaultDriverName = string(drivers.Postgres)
 
 type CommandExecutor interface {
-	execute(args []string, databaseURL string, driver drivers.Driver) error
+	execute(args []string, databaseURL string, driver domain.Driver) error
 }
 
 type Command struct {
