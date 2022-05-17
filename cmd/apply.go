@@ -15,15 +15,21 @@ import (
 
 type apply struct{}
 
-func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
-	migrationType := args[0]
-	if migrationType != "up" && migrationType != "down" {
-		return errors.New("Apply's first argument should be either up/down.")
-	}
+type MigrationFile struct {
+	fullPath string
+	name     string
+}
 
-	isUpMigration := migrationType == "up"
+type CommandArgs struct {
+	migrationFiles []MigrationFile
+	migrationType  string
+}
 
-	folderName := args[1]
+type Migrations struct {
+	files    []MigrationFile
+	isUpType bool
+}
+
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
