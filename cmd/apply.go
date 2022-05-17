@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,14 +16,21 @@ import (
 type apply struct{}
 
 func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
-	folderName := args[0]
+	migrationType := args[0]
+	if migrationType != "up" && migrationType != "down" {
+		return errors.New("Apply's first argument should be either up/down.")
+	}
+
+	isUpMigration := migrationType == "up"
+
+	folderName := args[1]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
 			return err
 		}
 
-		latestMigrationNumber, err := a.runFolderMigrations(folderName, previousMigrationNumber, driver)
+		latestMigrationNumber, err := a.runFolderMigrations(isUpMigration, folderName, previousMigrationNumber, driver)
 		if err != nil {
 			return err
 		}
@@ -35,7 +43,7 @@ func (a *apply) execute(args []string, databaseURL string, driver domain.Driver)
 	})
 }
 
-func (a *apply) runFolderMigrations(folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
+func (a *apply) runFolderMigrations(isUpMigration bool, folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
 	latestMigrationNumber := 0
 	items, err := ioutil.ReadDir(folderName)
 	if err != nil {

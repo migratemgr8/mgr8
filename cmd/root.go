@@ -31,7 +31,7 @@ func Execute() {
 		Use:   "apply",
 		Short: "apply runs migrations in the selected database",
 		Run:   applyCommand.Execute,
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MinimumNArgs(2),
 	}
 	applyCmd.Flags().StringVar(&applyCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	applyCmd.Flags().StringVar(&applyCommand.driverName, "driver", defaultDriverName, "Driver Name")
