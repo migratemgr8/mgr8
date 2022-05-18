@@ -11,14 +11,16 @@ import (
 )
 
 func CheckAndInstallTool(driver domain.Driver) error {
-	hasTables, err := driver.HasBaseTable()
+	isToolInstalled, err := driver.IsToolInstalled()
 	if err != nil {
 		return err
 	}
-	if !hasTables {
+
+	if !isToolInstalled {
 		fmt.Printf("Installing mgr8 into the database...\n")
-		return driver.CreateBaseTable()
+		return driver.InstallTool()
 	}
+
 	return nil
 }
 

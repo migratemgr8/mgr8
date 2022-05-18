@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/pingcap/parser/mysql"
@@ -67,10 +68,140 @@ func (d *mySqlDriver) ExecuteTransaction(url string, f func() error) error {
 	return d.tx.Commit()
 }
 
-func (d *mySqlDriver) GetLatestMigration() (int, error) {
-	var version int
-	err := d.tx.QueryRow(`SELECT version FROM migration_log ORDER BY version DESC LIMIT 1`).Scan(&version)
+func (d *mySqlDriver) IsToolInstalled() (bool, error) {
+	hasMigrationLogsTable, err := d.HasMigrationLogsTable()
 	if err != nil {
+		return false, err
+	}
+	hasAppliedMigrationsTable, err := d.HasAppliedMigrationsTable()
+	if err != nil {
+		return false, err
+	}
+	if hasAppliedMigrationsTable != hasMigrationLogsTable { // Has just one of them (XOR)
+		return false, errors.New("database in dirty state, tool is partially installed")
+	}
+	return hasAppliedMigrationsTable && hasMigrationLogsTable, err
+}
+
+func (d *mySqlDriver) InstallTool() error {
+	err := d.CreateMigrationsLogsTable()
+	if err != nil {
+		return err
+	}
+	err = d.CreateAppliedMigrationsTable()
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *mySqlDriver) UninstallTool() error {
+	err := d.DropMigrationsLogsTable()
+	if err != nil {
+		return err
+	}
+	err = d.DropAppliedMigrationsTable()
+	return err
+}
+
+func (d *mySqlDriver) HasMigrationLogsTable() (bool, error) {
+	var hasMigrationLogsTable bool
+	err := d.tx.QueryRow(`SELECT EXISTS (
+	   SELECT FROM information_schema.tables
+	   WHERE  table_name   = $1
+	   )`, domain.LogsTableName).Scan(&hasMigrationLogsTable)
+	if err != nil {
+		return false, err
+	}
+	return hasMigrationLogsTable, err
+}
+
+func (d *mySqlDriver) HasAppliedMigrationsTable() (bool, error) {
+	var hasAppliedMigrationsTable bool
+	err := d.tx.QueryRow(`SELECT EXISTS (
+	   SELECT FROM information_schema.tables
+	   WHERE  table_name   = $1
+	   )`, domain.AppliedTableName).Scan(&hasAppliedMigrationsTable)
+	if err != nil {
+		return false, err
+	}
+	return hasAppliedMigrationsTable, err
+}
+
+func (d *mySqlDriver) CreateMigrationsLogsTable() error {
+	_, err := d.tx.Exec(`CREATE TABLE migration_log (
+		num INTEGER,
+		type VARCHAR(4),
+		username VARCHAR(32),
+		date VARCHAR(32)
+		)`)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *mySqlDriver) CreateAppliedMigrationsTable() error {
+	_, err := d.tx.Exec(`CREATE TABLE applied_migrations (
+		version INTEGER,
+		username VARCHAR(32),
+		date VARCHAR(32),
+		hash VARCHAR(32)
+		)`)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *mySqlDriver) DropMigrationsLogsTable() error {
+	_, err := d.tx.Exec(`DROP TABLE migration_log`)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *mySqlDriver) DropAppliedMigrationsTable() error {
+	_, err := d.tx.Exec(`DROP TABLE applied_migrations`)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *mySqlDriver) InsertIntoMigrationLog(migrationNum int, migrationType string, username string, currentDate string) error {
+	_, err := d.tx.Exec(`INSERT INTO migration_log (
+		num,
+		type,
+		username,
+		date
+		) VALUES ($1, $2, $3, $4)`, migrationNum, migrationType, username, currentDate)
+	return err
+}
+
+func (d *mySqlDriver) InsertIntoAppliedMigrations(version int, username string, currentDate string, hash string) error {
+	_, err := d.tx.Exec(`INSERT INTO applied_migrations (
+		version,
+		username,
+		date,
+		hash
+		) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
+	return err
+}
+
+func (d *mySqlDriver) RemoveAppliedMigration(version int) error {
+	_, err := d.tx.Exec(`DELETE FROM applied_migrations WHERE version = $1`, version)
+	return err
+}
+
+func (d *mySqlDriver) GetLatestMigrationVersion() (int, error) {
+	var version int
+	err := d.tx.QueryRow(`SELECT version FROM applied_migrations ORDER BY version DESC LIMIT 1`).Scan(&version)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return version, nil
@@ -78,48 +209,11 @@ func (d *mySqlDriver) GetLatestMigration() (int, error) {
 
 func (d *mySqlDriver) GetVersionHashing(version int) (string, error) {
 	var hash string
-	err := d.tx.QueryRow(`SELECT hash FROM migration_log WHERE version = ? LIMIT 1`, version).Scan(&hash)
+	err := d.tx.QueryRow(`SELECT hash FROM applied_migrations WHERE version = $1 LIMIT 1`, version).Scan(&hash)
 	if err != nil {
 		return ``, err
 	}
 	return hash, nil
-}
-
-func (d *mySqlDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
-	_, err := d.tx.Exec(
-		`INSERT INTO migration_log (version, username, date, hash) VALUES (?, ?, ?, ?)`,
-		version, username, currentDate, hash)
-	return err
-}
-
-func (d *mySqlDriver) RemoveMigration(migrationNum int) error {
-	_, err := d.tx.Exec(`DELETE FROM migration_log WHERE version = $1`, migrationNum)
-	return err
-}
-
-func (d *mySqlDriver) HasBaseTable() (bool, error) {
-	var installed bool
-	err := d.tx.QueryRow(`
-		SELECT COUNT(*) FROM information_schema.tables 
-	    WHERE table_name = ?`, domain.LogsTableName).Scan(&installed)
-	if err != nil {
-		return false, err
-	}
-	return installed, err
-}
-
-func (d *mySqlDriver) CreateBaseTable() error {
-	_, err := d.tx.Exec(`
-		CREATE TABLE migration_log(
-			version INTEGER,
-			username VARCHAR(32),
-			date VARCHAR(32),
-			hash VARCHAR(32)
-	  	)`)
-	if err != nil {
-		return err
-	}
-	return err
 }
 
 type Visitor interface {

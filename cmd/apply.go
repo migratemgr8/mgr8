@@ -47,12 +47,17 @@ func (a *apply) execute(args []string, databaseURL string, migrationsDir string,
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		err := applications.CheckAndInstallTool(driver)
 
-		migrationsToRun, err := getMigrationsToRun(migrationFiles, previousMigrationNumber, commandArgs.numMigrations, commandArgs.migrationType)
+		version, err := driver.GetLatestMigrationVersion()
 		if err != nil {
 			return err
 		}
 
-		_, err = a.runMigrations(migrationsToRun, driver)
+		migrationsToRun, err := getMigrationsToRun(migrationFiles, version, commandArgs.numMigrations, commandArgs.migrationType)
+		if err != nil {
+			return err
+		}
+
+		_, err = a.runMigrations(migrationsToRun, version, driver)
 		if err != nil {
 			return err
 		}
@@ -199,18 +204,18 @@ func getMigrationsToRun(migrationFiles []MigrationFile, currentVersion int, numM
 	return migrations, nil
 }
 
-func (a *apply) runMigrations(migrations Migrations, driver domain.Driver) (int, error) {
-	version, err := driver.GetLatestMigration()
-	if err != nil {
-		return 0, err
-	}
-
+func (a *apply) runMigrations(migrations Migrations, version int, driver domain.Driver) (int, error) {
 	username_service := applications.NewUserNameService()
 	username, err := username_service.GetUserName()
 	if err != nil {
 		return 0, err
 	}
 	fmt.Println("User detected: " + username)
+
+	migrationType := "up"
+	if !migrations.isUpType {
+		migrationType = "down"
+	}
 
 	for _, file := range migrations.files {
 		migrationNum, err := applications.GetMigrationNumber(file.name)
@@ -233,7 +238,11 @@ func (a *apply) runMigrations(migrations Migrations, driver domain.Driver) (int,
 				}
 
 				version = version + 1
-				err = driver.InsertLatestMigration(version, username, currentDate, hash)
+				err = driver.InsertIntoMigrationLog(migrationNum, migrationType, username, currentDate)
+				if err != nil {
+					return 0, err
+				}
+				err = driver.InsertIntoAppliedMigrations(version, username, currentDate, hash)
 				if err != nil {
 					return 0, err
 				}
@@ -252,7 +261,12 @@ func (a *apply) runMigrations(migrations Migrations, driver domain.Driver) (int,
 				return 0, err
 			}
 
-			err = driver.RemoveMigration(version)
+			err = driver.InsertIntoMigrationLog(migrationNum, migrationType, username, currentDate)
+			if err != nil {
+				return 0, err
+			}
+
+			err = driver.RemoveAppliedMigration(version)
 			if err != nil {
 				return 0, err
 			}
