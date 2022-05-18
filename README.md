@@ -40,11 +40,13 @@ Set through command flag `--driver`.
 Set through command flag `--dir`.
 ### Execute migrations
 
+Requires: **database**, **dir**, **driver** <br/>
 Execute migrations by running
 ```bash
-./bin/mgr8 apply <up|down>
+./bin/mgr8 apply <up|down> <number_of_migrations>
 ```
-Needs: **database**, **dir**, **driver**
+- number_of_migrations: Number of migrations to run (Optional). If not specified, runs only one.
+
 ## Develop
 
 ### Requirements

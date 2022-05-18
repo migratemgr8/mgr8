@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,6 +24,7 @@ type MigrationFile struct {
 
 type CommandArgs struct {
 	migrationType string
+	numMigrations int
 }
 
 type Migrations struct {
@@ -48,7 +50,7 @@ func (a *apply) execute(args []string, databaseURL string, migrationsDir string,
 			return err
 		}
 
-		migrationsToRun, err := getMigrationsToRun(migrationFiles, commandArgs.migrationType)
+		migrationsToRun, err := getMigrationsToRun(migrationFiles, previousMigrationNumber, commandArgs.numMigrations, commandArgs.migrationType)
 		if err != nil {
 			return err
 		}
@@ -78,7 +80,20 @@ func parseArgs(args []string) (CommandArgs, error) {
 		return commandArgs, errors.New("apply's first argument should be either up/down")
 	}
 
+	numMigrations := 1
+	if len(args) == 2 {
+		var err error
+		numMigrations, err = strconv.Atoi(args[1])
+		if err != nil {
+			return commandArgs, err
+		}
+		if numMigrations == 0 {
+			return commandArgs, errors.New("can't run 0 migrations")
+		}
+	}
+
 	commandArgs.migrationType = migrationType
+	commandArgs.numMigrations = numMigrations
 
 	return commandArgs, nil
 }
@@ -129,24 +144,63 @@ func sortMigrationFiles(files []MigrationFile, isUpType bool) []MigrationFile {
 }
 
 // returns migrations files in folder that match type specified (up/down)
-func getMigrationsToRun(migrationFiles []MigrationFile, migrationType string) (Migrations, error) {
+func getMigrationsToRun(migrationFiles []MigrationFile, currentVersion int, numMigrations int, migrationType string) (Migrations, error) {
 	var migrations Migrations
 
 	isUpType := migrationType == "up"
 	var files []MigrationFile
 
+	migrationsToBeIncluded := map[int]bool{}
+
+	var firstNum int
+	var lastNum int
+
+	// set range of migrations
+	if isUpType {
+		firstNum = currentVersion + 1
+		lastNum = currentVersion + numMigrations
+	} else {
+		firstNum = currentVersion - numMigrations + 1
+		lastNum = currentVersion
+	}
+
+	if firstNum <= 0 {
+		return migrations, errors.New("migrations would exceed current migration version")
+	}
+
+	for i := firstNum; i <= lastNum; i++ {
+		migrationsToBeIncluded[i] = true
+	}
+
 	for _, file := range migrationFiles {
+		migrationNum, err := applications.GetMigrationNumber(file.name)
+		if err != nil {
+			return migrations, err
+		}
+
 		fileMigrationType, err := applications.GetMigrationType(file.name)
 		if err != nil {
 			return migrations, err
 		}
 
-		if migrationType == fileMigrationType {
+		shouldInclude, ok := migrationsToBeIncluded[migrationNum]
+
+		if migrationType == fileMigrationType && ok && shouldInclude {
 			files = append(files, file)
+			migrationsToBeIncluded[migrationNum] = false
 		}
 	}
 
-	migrations.files = sortMigrationFiles(files, isUpType)
+	// check if all migrations needed were found
+	for key, element := range migrationsToBeIncluded {
+		if element == true {
+			return migrations, errors.New("missing migration number " + strconv.Itoa(key))
+		}
+	}
+
+	files = sortMigrationFiles(files, isUpType)
+
+	migrations.files = files
 	migrations.isUpType = isUpType
 
 	return migrations, nil
