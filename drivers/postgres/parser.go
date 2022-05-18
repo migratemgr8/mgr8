@@ -68,6 +68,9 @@ func (d *postgresDriver) GetLatestMigration() (int, error) {
 	var version int
 	err := d.tx.QueryRow(`SELECT version FROM migration_log ORDER BY version DESC LIMIT 1`).Scan(&version)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return version, nil
