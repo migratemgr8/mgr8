@@ -55,8 +55,8 @@ func validateFolderMigrations(folderName string, previousMigrationNumber int, dr
 	return 0, nil
 }
 
-func validateFileMigration(version int, fileName string, driver domain.Driver) (bool, error) {
-	hash_file, err := applications.GetSqlHash(fileName)
+func validateFileMigration(version int, filePath string, driver domain.Driver) (bool, error) {
+	hash_file, err := applications.GetSqlHash(filePath)
 	if err != nil {
 		return false, err
 	}
