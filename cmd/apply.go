@@ -47,12 +47,17 @@ func (a *apply) execute(args []string, databaseURL string, migrationsDir string,
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		err := applications.CheckAndInstallTool(driver)
 
-		migrationsToRun, err := getMigrationsToRun(migrationFiles, previousMigrationNumber, commandArgs.numMigrations, commandArgs.migrationType)
+		version, err := driver.GetLatestMigration()
 		if err != nil {
 			return err
 		}
 
-		_, err = a.runMigrations(migrationsToRun, driver)
+		migrationsToRun, err := getMigrationsToRun(migrationFiles, version, commandArgs.numMigrations, commandArgs.migrationType)
+		if err != nil {
+			return err
+		}
+
+		_, err = a.runMigrations(migrationsToRun, version, driver)
 		if err != nil {
 			return err
 		}
@@ -199,12 +204,7 @@ func getMigrationsToRun(migrationFiles []MigrationFile, currentVersion int, numM
 	return migrations, nil
 }
 
-func (a *apply) runMigrations(migrations Migrations, driver domain.Driver) (int, error) {
-	version, err := driver.GetLatestMigration()
-	if err != nil {
-		return 0, err
-	}
-
+func (a *apply) runMigrations(migrations Migrations, version int, driver domain.Driver) (int, error) {
 	username_service := applications.NewUserNameService()
 	username, err := username_service.GetUserName()
 	if err != nil {
