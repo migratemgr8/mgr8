@@ -12,28 +12,28 @@ import (
 type validate struct{}
 
 func (v *validate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
-	folderName := args[0]
+	dir := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
 			return err
 		}
 
-		_, err = validateFolderMigrations(folderName, previousMigrationNumber, driver)
+		_, err = validateDirMigrations(dir, previousMigrationNumber, driver)
 
 		return err
 	})
 }
 
-func validateFolderMigrations(folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
-	items, err := ioutil.ReadDir(folderName)
+func validateDirMigrations(dir string, previousMigrationNumber int, driver domain.Driver) (int, error) {
+	items, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return 0, err
 	}
 
 	for _, item := range items {
 		fileName := item.Name()
-		fullName := path.Join(folderName, fileName)
+		fullName := path.Join(dir, fileName)
 
 		version, err := applications.GetMigrationNumber(fileName)
 		if err != nil {
