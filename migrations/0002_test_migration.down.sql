@@ -1,2 +1,2 @@
 DROP VIEW user_phones;
-ALTER TABLE users REMOVE COLUMN ddi;
+ALTER TABLE users DROP COLUMN ddi;
