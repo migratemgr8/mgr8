@@ -54,6 +54,10 @@ Available databases: postgres, mysql
 
 Passing the `-d` flag is optional and will run the container in detached mode, it won't block the terminal but you won't see database logs nor be able to close the container by using ctrl+c.
 
+### Testing
+
+Use `make test`, `make display-coverage` and `make coverage-report`.
+
 ### Snippets
 
 Executing migrations with postgres driver
