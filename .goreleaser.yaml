@@ -15,16 +15,6 @@ builds:
       - -mod=readonly
     ldflags:
       - -s -w -X main.version={{.Version}}
-  - id: darwin-arm64
-    main: ./
-    binary: golang-cross
-    goos:
-      - darwin
-    goarch:
-      - arm64
-    env:
-      - CC=oa64-clang
-      - CXX=oa64-clang++
   - id: linux-amd64
     main: ./
     binary: golang-cross
