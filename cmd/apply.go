@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,6 +24,7 @@ type MigrationFile struct {
 
 type CommandArgs struct {
 	migrationType string
+	numMigrations int
 }
 
 type Migrations struct {
@@ -76,6 +78,14 @@ func parseArgs(args []string) (CommandArgs, error) {
 	migrationType := args[0]
 	if migrationType != "up" && migrationType != "down" {
 		return commandArgs, errors.New("apply's first argument should be either up/down")
+	}
+
+	if len(args) == 2 {
+		numMigrations, err := strconv.Atoi(args[1])
+		if err != nil {
+			return commandArgs, err
+		}
+		commandArgs.numMigrations = numMigrations
 	}
 
 	commandArgs.migrationType = migrationType
