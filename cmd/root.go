@@ -11,9 +11,7 @@ func Execute() {
 	rootCmd := &cobra.Command{
 		Use:   "mgr8",
 		Short: "mgr8 is a framework-agnostic database migrations tool",
-		Long: `Lonog version: MGR8 a framework agnostic database migrations tool
-                sbrubbles
-                sbrubbles`,
+		Long:  `Long version: mgr8 is an agnostic tool that abstracts database migration operations`,
 	}
 
 	generateCommand := Command{cmd: &generate{}}
