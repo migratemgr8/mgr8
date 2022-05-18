@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/jmoiron/sqlx"
@@ -21,7 +22,7 @@ func NewPostgresDriver() *postgresDriver {
 	return &postgresDriver{}
 }
 
-func (d *postgresDriver) Deparser() domain.Deparser{
+func (d *postgresDriver) Deparser() domain.Deparser {
 	return &deparser{}
 }
 
@@ -90,6 +91,11 @@ func (d *postgresDriver) InsertLatestMigration(version int, username string, cur
 	return err
 }
 
+func (d *postgresDriver) RemoveMigration(migrationNum int) error {
+	_, err := d.tx.Exec(`DELETE FROM migration_log WHERE version = $1`, migrationNum)
+	return err
+}
+
 func (d *postgresDriver) HasBaseTable() (bool, error) {
 	var installed bool
 	err := d.tx.QueryRow(`SELECT EXISTS (
@@ -146,10 +152,11 @@ func (d *postgresDriver) parseTable(tableName string, parsedStatement *pg_query.
 		columns[columnDefinition.Colname] = d.parseColumn(columnDefinition)
 	}
 	return &domain.Table{
-		Name: tableName,
+		Name:    tableName,
 		Columns: columns,
 	}
 }
+
 func (d *postgresDriver) parseView(parsedStatement *pg_query.ViewStmt) *domain.View {
 	// TODO
 	return &domain.View{
