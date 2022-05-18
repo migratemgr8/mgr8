@@ -14,7 +14,9 @@ type validate struct{}
 func (v *validate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
 	dir := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
-		_, err := validateDirMigrations(dir, driver)
+		err := applications.CheckAndInstallTool(driver)
+
+		_, err = validateDirMigrations(dir, driver)
 
 		return err
 	})
