@@ -19,15 +19,9 @@ jobs:
         with:
           go-version: '^1.17.6'
 
-      - name: Set go environment
-        run: go env -w CGO_ENABLED=1
+      - name: Set up release environment
+        run: |-
+          echo 'GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}' >> .release-env
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --rm-dist --config build/.goreleaser.yaml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CGO_ENABLED: 1
+        run: make release
