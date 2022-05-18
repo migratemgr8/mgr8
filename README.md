@@ -2,6 +2,10 @@
 
 An agnostic tool that abstracts migration operations
 
+### Suported databases
+- **postgres**
+- **mysql**
+
 ## How to use
 
 ### Requirements
@@ -23,20 +27,24 @@ make build
 
 ### Run commands
 
+#### Set needed variables
+
+- **database**: Database URL. <br/>
+Set through `DB_HOST` environment variable or by using command flag `--database`.
+
+- **driver**: Driver name. <br/>
+Defaults to **postgres**. <br/>
+Set through command flag `--driver`.
+
+- **dir**: Migrations directory. <br/>
+Set through command flag `--dir`.
 ### Execute migrations
 
 Execute migrations by running
 ```bash
-./bin/mgr8 <migrations_folder> <driver>
+./bin/mgr8 apply <up|down>
 ```
-Currently supported drivers: **postgres** and **mysql**.
-<br/>
-Defaults to **postgres**.
-<br/>
-Make sure you either have `DB_HOST` environment variable with you database connection string or you pass it in by using the flag `--database`.
-<br/>
-Example connection string: `postgres://root:root@localhost:5432/database_name?sslmode=disable`
-
+Needs: **database**, **dir**, **driver**
 ## Develop
 
 ### Requirements
@@ -54,6 +62,10 @@ Available databases: postgres, mysql
 
 Passing the `-d` flag is optional and will run the container in detached mode, it won't block the terminal but you won't see database logs nor be able to close the container by using ctrl+c.
 
+Point to database by setting env **DB_HOST**.
+<br/>
+For postgres use DB_HOST=`postgres://root:root@localhost:5432/database_name?sslmode=disable`
+
 ### Testing
 
 Use `make test`, `make display-coverage` and `make coverage-report`.
@@ -62,11 +74,11 @@ Use `make test`, `make display-coverage` and `make coverage-report`.
 
 Executing migrations with postgres driver
 ```bash
-./bin/mgr8 apply --database=postgres://root:root@localhost:5432/core?sslmode=disable ./migrations
+./bin/mgr8 apply up --database=postgres://root:root@localhost:5432/core?sslmode=disable --dir=./migrations
 ```
 
 Executing migrations with mysql driver
 ```bash
-./bin/mgr8 apply --database=root:root@tcp\(localhost:3306\)/core ./migrations mysql
+./bin/mgr8 apply up --database=root:root@tcp\(localhost:3306\)/core --dir=./migrations --driver=mysql
 ```
 
