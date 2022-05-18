@@ -6,7 +6,7 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
-type deparser struct { }
+type deparser struct{}
 
 func (d *deparser) CreateTable(table *domain.Table) string {
 	// TODO: how to mount this string?
@@ -17,9 +17,12 @@ func (d *deparser) DropTable(tableName string) string {
 	return fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)
 }
 
-func (d *deparser) AddColumn() string {
-	// TODO
-	return ""
+func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column) string {
+	columnDatatype := column.Datatype
+	if size, ok := column.Parameters["size"]; ok {
+		columnDatatype = fmt.Sprintf("%s(%d)", column.Datatype, size)
+	}
+	return fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %v", tableName, columnName, columnDatatype)
 }
 
 func (d *deparser) DropColumn(tableName, columnName string) string {
