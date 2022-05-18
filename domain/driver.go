@@ -4,12 +4,25 @@ type Driver interface {
 	ExecuteTransaction(url string, f func() error) error
 
 	Execute(statements []string) error
-	GetLatestMigration() (int, error)
+
+	IsToolInstalled() (bool, error)
+	InstallTool() error
+	UninstallTool() error
+
+	HasMigrationLogsTable() (bool, error)
+	CreateMigrationsLogsTable() error
+	DropMigrationsLogsTable() error
+
+	HasAppliedMigrationsTable() (bool, error)
+	CreateAppliedMigrationsTable() error
+	DropAppliedMigrationsTable() error
+
+	InsertIntoMigrationLog(migrationNum int, migrationType string, username string, currentDate string) error
+	InsertIntoAppliedMigrations(version int, username string, currentDate string, hash string) error
+	RemoveAppliedMigration(version int) error
+
+	GetLatestMigrationVersion() (int, error)
 	GetVersionHashing(version int) (string, error)
-	InsertLatestMigration(int, string, string, string) error
-	RemoveMigration(int) error
-	CreateBaseTable() error
-	HasBaseTable() (bool, error)
 
 	ParseMigration(scriptFile string) (*Schema, error)
 	Deparser() Deparser
