@@ -34,7 +34,7 @@ func (t *Table) Diff(originalTable *Table) []Diff {
 		if !originalHasColumn {
 			diffsQueue = append(diffsQueue, NewCreateColumnDiff(t.Name, column))
 		} else {
-			diffsQueue = append(diffsQueue, column.Diff(t, originalColumn)...)
+			diffsQueue = append(diffsQueue, column.Diff(t, columnName, originalColumn)...)
 		}
 	}
 
@@ -47,19 +47,15 @@ func (t *Table) Diff(originalTable *Table) []Diff {
 	return diffsQueue
 }
 
-func (c *Column) Diff(table *Table, originalColumn *Column) []Diff {
+func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) []Diff {
 	diffsQueue := []Diff{}
-
-	for columnName, column := range table.Columns {
-		originalColumn := table.Columns[columnName]
-		if originalColumn.IsNotNull != column.IsNotNull {
-			if column.IsNotNull {
-				diffsQueue = append(diffsQueue, NewMakeColumnNotNullDiff(table.Name, columnName))
-			} else {
-				diffsQueue = append(diffsQueue, NewUnmakeColumnNotNullDiff(table.Name, columnName))
-			}
+	column := table.Columns[columnName]
+	if column.IsNotNull != originalColumn.IsNotNull {
+		if column.IsNotNull {
+			diffsQueue = append(diffsQueue, NewMakeColumnNotNullDiff(table.Name, columnName))
+		} else {
+		 	diffsQueue = append(diffsQueue, NewUnmakeColumnNotNullDiff(table.Name, columnName))
 		}
 	}
-
 	return diffsQueue
 }

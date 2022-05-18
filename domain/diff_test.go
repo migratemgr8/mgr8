@@ -40,5 +40,59 @@ var _ = Describe("Schema Diff", func() {
 					))
 			})
 		})
+
+		When("Column switches to not null", func() {
+			It("Returns MakeColumnNotNull", func() {
+				oldSchema := &Schema{
+					Tables: map[string]*Table{
+						"table": NewTable("table", map[string]*Column{
+							"column": &Column{IsNotNull: false},
+						}),
+					},
+					Views:  nil,
+				}
+				newSchema := &Schema{
+					Tables: map[string]*Table{
+						"table": NewTable("table", map[string]*Column{
+							"column": &Column{IsNotNull: true},
+						}),
+					},
+					Views:  nil,
+				}
+
+				diffQueue := newSchema.Diff(oldSchema)
+				Expect(diffQueue).To(HaveLen(1))
+				Expect(diffQueue).To(ContainElements(
+					NewMakeColumnNotNullDiff("table", "column"),
+				))
+			})
+		})
+
+		When("Column switches to nullable", func() {
+			It("Returns UnmakeColumnNotNull", func() {
+				oldSchema := &Schema{
+					Tables: map[string]*Table{
+						"table": NewTable("table", map[string]*Column{
+							"column": &Column{IsNotNull: true},
+						}),
+					},
+					Views:  nil,
+				}
+				newSchema := &Schema{
+					Tables: map[string]*Table{
+						"table": NewTable("table", map[string]*Column{
+							"column": &Column{IsNotNull: false},
+						}),
+					},
+					Views:  nil,
+				}
+
+				diffQueue := newSchema.Diff(oldSchema)
+				Expect(diffQueue).To(HaveLen(1))
+				Expect(diffQueue).To(ContainElements(
+					NewUnmakeColumnNotNullDiff("table", "column"),
+				))
+			})
+		})
 	})
 })
