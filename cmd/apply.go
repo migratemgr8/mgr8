@@ -232,7 +232,7 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 
 		if migrations.isUpType {
 			if migrationNum == version+1 {
-				err = a.applyMigrationScript(driver, file.fullPath)
+				err = a.applyMigration(driver, file)
 				if err != nil {
 					return 0, err
 				}
@@ -256,7 +256,7 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 				}
 			}
 		} else if !migrations.isUpType && migrationNum == version {
-			err = a.applyMigrationScript(driver, file.fullPath)
+			err = a.applyMigration(driver, file)
 			if err != nil {
 				return 0, err
 			}
@@ -277,9 +277,9 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 	return version, nil
 }
 
-func (a *apply) applyMigrationScript(driver domain.Driver, scriptName string) error {
-	fmt.Printf("Applying file %s\n", scriptName)
-	content, err := os.ReadFile(scriptName)
+func (a *apply) applyMigration(driver domain.Driver, migration MigrationFile) error {
+	fmt.Printf("Applying file %s\n", migration.name)
+	content, err := os.ReadFile(migration.fullPath)
 	if err != nil {
 		return fmt.Errorf("could not read from file: %s", err)
 	}
