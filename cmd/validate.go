@@ -14,18 +14,13 @@ type validate struct{}
 func (v *validate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
 	dir := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
-		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
-		if err != nil {
-			return err
-		}
-
-		_, err = validateDirMigrations(dir, previousMigrationNumber, driver)
+		_, err := validateDirMigrations(dir, driver)
 
 		return err
 	})
 }
 
-func validateDirMigrations(dir string, previousMigrationNumber int, driver domain.Driver) (int, error) {
+func validateDirMigrations(dir string, driver domain.Driver) (int, error) {
 	items, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return 0, err
