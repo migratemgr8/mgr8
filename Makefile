@@ -7,7 +7,17 @@ build: main.go
 
 .PHONY: test
 test:
-	go test ./...
+	go test ./... -coverprofile=unit_coverage.out
+
+.PHONY: coverage-report
+coverage-report:
+	go tool cover -html=unit_coverage.out
+
+UNIT_COVERAGE:= $(shell go tool cover -func=unit_coverage.out | tail -n 1 | cut -d ' ' -f 3 | rev | cut -c 1-5 | rev)
+
+.PHONY: display-coverage
+display-coverage:
+	@echo "Unit Coverage: $(UNIT_COVERAGE)"
 
 .PHONY: release
 release:
