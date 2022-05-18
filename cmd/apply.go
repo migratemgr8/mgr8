@@ -80,15 +80,17 @@ func parseArgs(args []string) (CommandArgs, error) {
 		return commandArgs, errors.New("apply's first argument should be either up/down")
 	}
 
+	numMigrations := 1
 	if len(args) == 2 {
-		numMigrations, err := strconv.Atoi(args[1])
+		var err error
+		numMigrations, err = strconv.Atoi(args[1])
 		if err != nil {
 			return commandArgs, err
 		}
-		commandArgs.numMigrations = numMigrations
 	}
 
 	commandArgs.migrationType = migrationType
+	commandArgs.numMigrations = numMigrations
 
 	return commandArgs, nil
 }
