@@ -10,6 +10,18 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
+func CheckAndInstallTool(driver domain.Driver) error {
+	hasTables, err := driver.HasBaseTable()
+	if err != nil {
+		return err
+	}
+	if !hasTables {
+		fmt.Printf("Installing mgr8 into the database...\n")
+		return driver.CreateBaseTable()
+	}
+	return nil
+}
+
 func GetPreviousMigrationNumber(driver domain.Driver) (int, error) {
 	hasTables, err := driver.HasBaseTable()
 
