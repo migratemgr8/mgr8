@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -15,22 +16,39 @@ import (
 
 type apply struct{}
 
+type MigrationFile struct {
+	fullPath string
+	name     string
+}
+
+type CommandArgs struct {
+	migrationFiles []MigrationFile
+	migrationType  string
+}
+
+type Migrations struct {
+	files    []MigrationFile
+	isUpType bool
+}
+
 func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
-	migrationType := args[0]
-	if migrationType != "up" && migrationType != "down" {
-		return errors.New("Apply's first argument should be either up/down.")
+	commandArgs, err := parseArgs(args)
+	if err != nil {
+		return err
 	}
 
-	isUpMigration := migrationType == "up"
-
-	folderName := args[1]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		previousMigrationNumber, err := applications.GetPreviousMigrationNumber(driver)
 		if err != nil {
 			return err
 		}
 
-		latestMigrationNumber, err := a.runFolderMigrations(isUpMigration, folderName, previousMigrationNumber, driver)
+		migrationsToRun, err := getMigrationsToRun(commandArgs)
+		if err != nil {
+			return err
+		}
+
+		latestMigrationNumber, err := a.runMigrations(migrationsToRun, previousMigrationNumber, driver)
 		if err != nil {
 			return err
 		}
@@ -43,12 +61,101 @@ func (a *apply) execute(args []string, databaseURL string, driver domain.Driver)
 	})
 }
 
-func (a *apply) runFolderMigrations(isUpMigration bool, folderName string, previousMigrationNumber int, driver domain.Driver) (int, error) {
-	latestMigrationNumber := 0
-	items, err := ioutil.ReadDir(folderName)
-	if err != nil {
-		return 0, err
+func parseArgs(args []string) (CommandArgs, error) {
+	var commandArgs CommandArgs
+
+	if len(args) < 2 {
+		return commandArgs, errors.New("arguments missing")
 	}
+
+	migrationType := args[0]
+	if migrationType != "up" && migrationType != "down" {
+		return commandArgs, errors.New("apply's first argument should be either up/down")
+	}
+
+	dir := args[1]
+	migrationFiles, err := getMigrationsFiles(dir)
+	if err != nil {
+		return commandArgs, err
+	}
+
+	commandArgs.migrationType = migrationType
+	commandArgs.migrationFiles = migrationFiles
+
+	return commandArgs, nil
+}
+
+// reads directory and returns an array containing full paths of files inside
+func getMigrationsFiles(dir string) ([]MigrationFile, error) {
+	migrationFiles := []MigrationFile{}
+
+	dirPath, err := filepath.Abs(dir)
+	if err != nil {
+		return []MigrationFile{}, err
+	}
+
+	fileInfos, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return []MigrationFile{}, err
+	}
+
+	for _, fileInfo := range fileInfos {
+		var migrationFile MigrationFile
+		migrationFile.name = fileInfo.Name()
+		migrationFile.fullPath = filepath.Join(dirPath, fileInfo.Name())
+		migrationFiles = append(migrationFiles, migrationFile)
+	}
+
+	return migrationFiles, err
+}
+
+// returns sorted migration files
+// if migration of type up orders ascending, descending otherwise
+func sortMigrationFiles(files []MigrationFile, isUpType bool) []MigrationFile {
+	if isUpType {
+		// sort by ascending
+		sort.Slice(files, func(i, j int) bool {
+			iNum, _ := applications.GetMigrationNumber(files[i].name)
+			jNum, _ := applications.GetMigrationNumber(files[j].name)
+			return iNum < jNum
+		})
+	} else {
+		// sort by descending
+		sort.Slice(files, func(i, j int) bool {
+			iNum, _ := applications.GetMigrationNumber(files[i].name)
+			jNum, _ := applications.GetMigrationNumber(files[j].name)
+			return iNum >= jNum
+		})
+	}
+	return files
+}
+
+// returns migrations files in folder that match type specified (up/down)
+func getMigrationsToRun(args CommandArgs) (Migrations, error) {
+	var migrations Migrations
+
+	isUpType := args.migrationType == "up"
+	var files []MigrationFile
+
+	for _, file := range args.migrationFiles {
+		migrationType, err := applications.GetMigrationType(file.name)
+		if err != nil {
+			return migrations, err
+		}
+
+		if migrationType == args.migrationType {
+			files = append(files, file)
+		}
+	}
+
+	migrations.files = sortMigrationFiles(files, isUpType)
+	migrations.isUpType = isUpType
+
+	return migrations, nil
+}
+
+func (a *apply) runMigrations(migrations Migrations, previousMigrationNumber int, driver domain.Driver) (int, error) {
+	version := previousMigrationNumber
 
 	username_service := applications.NewUserNameService()
 	username, err := username_service.GetUserName()
@@ -57,43 +164,55 @@ func (a *apply) runFolderMigrations(isUpMigration bool, folderName string, previ
 	}
 	fmt.Println("User detected: " + username)
 
-	for _, item := range items {
-		fileName := item.Name()
-		fullName := path.Join(folderName, fileName)
-
-		itemMigrationNumber, err := applications.GetMigrationNumber(fileName)
+	for _, file := range migrations.files {
+		migrationNum, err := applications.GetMigrationNumber(file.name)
 		if err != nil {
-			continue
+			return 0, err
 		}
-		if itemMigrationNumber > latestMigrationNumber {
-			latestMigrationNumber = itemMigrationNumber
+
+		currentDate := time.Now().Format("2006-01-02 15:04:05")
+
+		hash, err := applications.GetSqlHash(file.fullPath)
+		if err != nil {
+			return 0, err
 		}
-		if itemMigrationNumber <= previousMigrationNumber {
-			valid, err := validateFileMigration(itemMigrationNumber, fullName, driver)
+
+		if migrations.isUpType {
+			if migrationNum == version+1 {
+				err = a.applyMigrationScript(driver, file.fullPath)
+				if err != nil {
+					return 0, err
+				}
+
+				version = version + 1
+				err = driver.InsertLatestMigration(version, username, currentDate, hash)
+				if err != nil {
+					return 0, err
+				}
+			} else {
+				valid, err := validateFileMigration(migrationNum, file.fullPath, driver)
+				if err != nil {
+					return 0, err
+				}
+				if !valid {
+					return 0, fmt.Errorf("❌ invalid migration file %s", file.name)
+				}
+			}
+		} else if !migrations.isUpType && migrationNum == version {
+			err = a.applyMigrationScript(driver, file.fullPath)
 			if err != nil {
 				return 0, err
 			}
-			if !valid {
-				return 0, fmt.Errorf("❌ invalid migration file %s", fileName)
-			}
-			continue
-		}
-		err = a.applyMigrationScript(driver, fullName)
-		if err != nil {
-			return 0, err
-		}
-		currentDate := time.Now().Format("2006-01-02 15:04:05")
 
-		hash, err := applications.GetSqlHash(fullName)
-		if err != nil {
-			return 0, err
-		}
-		err = driver.InsertLatestMigration(latestMigrationNumber, username, currentDate, hash)
-		if err != nil {
-			return 0, err
+			err = driver.RemoveMigration(version)
+			if err != nil {
+				return 0, err
+			}
+			version = version - 1
 		}
 	}
-	return latestMigrationNumber, nil
+
+	return version, nil
 }
 
 func (a *apply) applyMigrationScript(driver domain.Driver, scriptName string) error {

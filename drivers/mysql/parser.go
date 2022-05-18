@@ -2,9 +2,10 @@ package mysql
 
 import (
 	"database/sql"
+	"log"
+
 	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/parser/types"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -91,6 +92,11 @@ func (d *mySqlDriver) InsertLatestMigration(version int, username string, curren
 	return err
 }
 
+func (d *mySqlDriver) RemoveMigration(migrationNum int) error {
+	_, err := d.tx.Exec(`DELETE FROM migration_log WHERE version = $1`, migrationNum)
+	return err
+}
+
 func (d *mySqlDriver) HasBaseTable() (bool, error) {
 	var installed bool
 	err := d.tx.QueryRow(`
@@ -145,7 +151,7 @@ func (x *extractor) parseTable(tableName string, stmt *ast.CreateTableStmt) *dom
 		columns[c.Name.Name.O] = x.parseColumn(c)
 	}
 	return &domain.Table{
-		Name: tableName,
+		Name:    tableName,
 		Columns: columns,
 	}
 }

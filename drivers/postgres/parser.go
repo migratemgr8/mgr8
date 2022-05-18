@@ -21,7 +21,7 @@ func NewPostgresDriver() *postgresDriver {
 	return &postgresDriver{}
 }
 
-func (d *postgresDriver) Deparser() domain.Deparser{
+func (d *postgresDriver) Deparser() domain.Deparser {
 	return &deparser{}
 }
 
@@ -68,6 +68,9 @@ func (d *postgresDriver) GetLatestMigration() (int, error) {
 	var version int
 	err := d.tx.QueryRow(`SELECT version FROM migration_log ORDER BY version DESC LIMIT 1`).Scan(&version)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return version, nil
@@ -84,6 +87,11 @@ func (d *postgresDriver) GetVersionHashing(version int) (string, error) {
 
 func (d *postgresDriver) InsertLatestMigration(version int, username string, currentDate string, hash string) error {
 	_, err := d.tx.Exec(`INSERT INTO migration_log (version, username, date, hash) VALUES ($1, $2, $3, $4)`, version, username, currentDate, hash)
+	return err
+}
+
+func (d *postgresDriver) RemoveMigration(migrationNum int) error {
+	_, err := d.tx.Exec(`DELETE FROM migration_log WHERE version = $1`, migrationNum)
 	return err
 }
 
@@ -143,10 +151,11 @@ func (d *postgresDriver) parseTable(tableName string, parsedStatement *pg_query.
 		columns[columnDefinition.Colname] = d.parseColumn(columnDefinition)
 	}
 	return &domain.Table{
-		Name: tableName,
+		Name:    tableName,
 		Columns: columns,
 	}
 }
+
 func (d *postgresDriver) parseView(parsedStatement *pg_query.ViewStmt) *domain.View {
 	// TODO
 	return &domain.View{

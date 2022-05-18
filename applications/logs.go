@@ -1,7 +1,9 @@
 package applications
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -29,4 +31,17 @@ func GetMigrationNumber(itemName string) (int, error) {
 		return 0, err
 	}
 	return migrationVersion, nil
+}
+
+func GetMigrationType(fileName string) (string, error) {
+	re := regexp.MustCompile(`\.(.*?)\.`) // gets string in between dots
+	match := re.FindStringSubmatch(fileName)
+	if len(match) > 1 {
+		migrationType := match[1]
+		if migrationType != "up" && migrationType != "down" {
+			return "", errors.New("migration type should be either up/down")
+		}
+		return migrationType, nil
+	}
+	return "", errors.New("migration file name in wrong format")
 }

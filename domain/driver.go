@@ -7,6 +7,7 @@ type Driver interface {
 	GetLatestMigration() (int, error)
 	GetVersionHashing(version int) (string, error)
 	InsertLatestMigration(int, string, string, string) error
+	RemoveMigration(int) error
 	CreateBaseTable() error
 	HasBaseTable() (bool, error)
 
