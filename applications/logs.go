@@ -22,19 +22,6 @@ func CheckAndInstallTool(driver domain.Driver) error {
 	return nil
 }
 
-func GetPreviousMigrationNumber(driver domain.Driver) (int, error) {
-	hasTables, err := driver.HasBaseTable()
-
-	if err != nil {
-		return 0, err
-	}
-	if hasTables {
-		return driver.GetLatestMigration()
-	}
-	fmt.Printf("Installing mgr8 into the database...\n")
-	return 0, driver.CreateBaseTable()
-}
-
 func GetMigrationNumber(itemName string) (int, error) {
 	itemNameParts := strings.Split(itemName, "_")
 	migrationVersionStr := itemNameParts[0]
