@@ -27,19 +27,24 @@ make build
 
 ### Run commands
 
-#### How to set needed variables
+#### Set needed variables
 
-- **database_url**: set through `DB_HOST` environment variable or by using command flag `--database`.
-- **driver**: set through command flag `--driver` (optional). Defaults to **postgres**.
-- **migrations_dir**: set through command flag `--dir`.
+- **database**: Database URL. <br/>
+Set through `DB_HOST` environment variable or by using command flag `--database`.
 
+- **driver**: Driver name. <br/>
+Defaults to **postgres**. <br/>
+Set through command flag `--driver`.
+
+- **dir**: Migrations directory. <br/>
+Set through command flag `--dir`.
 ### Execute migrations
 
 Execute migrations by running
 ```bash
 ./bin/mgr8 apply <up|down>
 ```
-Needs: **database_url**, **migrations_dir**, **driver**
+Needs: **database**, **dir**, **driver**
 ## Develop
 
 ### Requirements
