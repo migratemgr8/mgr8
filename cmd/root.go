@@ -25,16 +25,18 @@ func Execute() {
 	}
 	generateCmd.Flags().StringVar(&generateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	generateCmd.Flags().StringVar(&generateCommand.driverName, "driver", defaultDriverName, "Driver Name")
+	generateCmd.Flags().StringVar(&generateCommand.migrationsDir, "dir", "", "Migrations Directory")
 
 	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{
 		Use:   "apply",
 		Short: "apply runs migrations in the selected database",
 		Run:   applyCommand.Execute,
-		Args:  cobra.MinimumNArgs(2),
+		Args:  cobra.MinimumNArgs(1),
 	}
 	applyCmd.Flags().StringVar(&applyCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	applyCmd.Flags().StringVar(&applyCommand.driverName, "driver", defaultDriverName, "Driver Name")
+	applyCmd.Flags().StringVar(&applyCommand.migrationsDir, "dir", "", "Migrations Directory")
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
@@ -45,6 +47,7 @@ func Execute() {
 	}
 	validateCmd.Flags().StringVar(&validateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	validateCmd.Flags().StringVar(&validateCommand.driverName, "driver", defaultDriverName, "Driver Name")
+	validateCmd.Flags().StringVar(&validateCommand.migrationsDir, "dir", "", "Migrations Directory")
 
 	rootCmd.AddCommand(applyCmd, generateCmd, validateCmd)
 

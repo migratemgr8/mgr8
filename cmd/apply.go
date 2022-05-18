@@ -22,8 +22,7 @@ type MigrationFile struct {
 }
 
 type CommandArgs struct {
-	migrationFiles []MigrationFile
-	migrationType  string
+	migrationType string
 }
 
 type Migrations struct {
@@ -31,7 +30,13 @@ type Migrations struct {
 	isUpType bool
 }
 
-func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
+func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+	dir := migrationsDir
+	migrationFiles, err := getMigrationsFiles(dir)
+	if err != nil {
+		return err
+	}
+
 	commandArgs, err := parseArgs(args)
 	if err != nil {
 		return err
@@ -43,7 +48,7 @@ func (a *apply) execute(args []string, databaseURL string, driver domain.Driver)
 			return err
 		}
 
-		migrationsToRun, err := getMigrationsToRun(commandArgs)
+		migrationsToRun, err := getMigrationsToRun(migrationFiles, commandArgs.migrationType)
 		if err != nil {
 			return err
 		}
@@ -64,7 +69,7 @@ func (a *apply) execute(args []string, databaseURL string, driver domain.Driver)
 func parseArgs(args []string) (CommandArgs, error) {
 	var commandArgs CommandArgs
 
-	if len(args) < 2 {
+	if len(args) == 0 {
 		return commandArgs, errors.New("arguments missing")
 	}
 
@@ -73,14 +78,7 @@ func parseArgs(args []string) (CommandArgs, error) {
 		return commandArgs, errors.New("apply's first argument should be either up/down")
 	}
 
-	dir := args[1]
-	migrationFiles, err := getMigrationsFiles(dir)
-	if err != nil {
-		return commandArgs, err
-	}
-
 	commandArgs.migrationType = migrationType
-	commandArgs.migrationFiles = migrationFiles
 
 	return commandArgs, nil
 }
@@ -131,19 +129,19 @@ func sortMigrationFiles(files []MigrationFile, isUpType bool) []MigrationFile {
 }
 
 // returns migrations files in folder that match type specified (up/down)
-func getMigrationsToRun(args CommandArgs) (Migrations, error) {
+func getMigrationsToRun(migrationFiles []MigrationFile, migrationType string) (Migrations, error) {
 	var migrations Migrations
 
-	isUpType := args.migrationType == "up"
+	isUpType := migrationType == "up"
 	var files []MigrationFile
 
-	for _, file := range args.migrationFiles {
-		migrationType, err := applications.GetMigrationType(file.name)
+	for _, file := range migrationFiles {
+		fileMigrationType, err := applications.GetMigrationType(file.name)
 		if err != nil {
 			return migrations, err
 		}
 
-		if migrationType == args.migrationType {
+		if migrationType == fileMigrationType {
 			files = append(files, file)
 		}
 	}
