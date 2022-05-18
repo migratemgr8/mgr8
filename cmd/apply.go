@@ -31,7 +31,7 @@ type Migrations struct {
 	isUpType bool
 }
 
-func (a *apply) execute(args []string, databaseURL string, driver domain.Driver) error {
+func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
 	commandArgs, err := parseArgs(args)
 	if err != nil {
 		return err
