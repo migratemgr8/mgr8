@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 
 	"github.com/jmoiron/sqlx"
