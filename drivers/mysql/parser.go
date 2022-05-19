@@ -130,7 +130,7 @@ func (d *mySqlDriver) HasAppliedMigrationsTable() (bool, error) {
 
 func (d *mySqlDriver) CreateMigrationsLogsTable() error {
 	_, err := d.tx.Exec(`CREATE TABLE migration_log (
-		num INTEGER,
+		migration_number INTEGER,
 		type VARCHAR(4),
 		username VARCHAR(32),
 		date VARCHAR(32)
@@ -172,7 +172,7 @@ func (d *mySqlDriver) DropAppliedMigrationsTable() error {
 
 func (d *mySqlDriver) InsertIntoMigrationLog(migrationNum int, migrationType string, username string, currentDate string) error {
 	_, err := d.tx.Exec(`INSERT INTO migration_log (
-		num,
+		migration_number,
 		type,
 		username,
 		date
