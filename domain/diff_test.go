@@ -73,7 +73,7 @@ var _ = Describe("Schema Diff", func() {
 				oldSchema := &Schema{
 					Tables: map[string]*Table{
 						"table": NewTable("table", map[string]*Column{
-							"column": &Column{IsNotNull: true},
+							"column": {IsNotNull: true},
 						}),
 					},
 					Views: nil,
@@ -81,7 +81,7 @@ var _ = Describe("Schema Diff", func() {
 				newSchema := &Schema{
 					Tables: map[string]*Table{
 						"table": NewTable("table", map[string]*Column{
-							"column": &Column{IsNotNull: false},
+							"column": {IsNotNull: false},
 						}),
 					},
 					Views: nil,
@@ -91,6 +91,31 @@ var _ = Describe("Schema Diff", func() {
 				Expect(diffQueue).To(HaveLen(1))
 				Expect(diffQueue).To(ContainElements(
 					NewUnmakeColumnNotNullDiff("table", "column"),
+				))
+			})
+		})
+
+		When("New column is added", func() {
+			It("Returns CreateColumn", func() {
+				column := &Column{Datatype: "integer"}
+
+				oldSchema := &Schema{
+					Tables: map[string]*Table{
+						"tableName": NewTable("tableName", map[string]*Column{}),
+					},
+				}
+				newSchema := &Schema{
+					Tables: map[string]*Table{
+						"tableName": NewTable("tableName", map[string]*Column{
+							"newColumn": column,
+						}),
+					},
+				}
+
+				diffQueue := newSchema.Diff(oldSchema)
+				Expect(diffQueue).To(HaveLen(1))
+				Expect(diffQueue).To(ContainElements(
+					NewCreateColumnDiff("tableName", "newColumn", column),
 				))
 			})
 		})
