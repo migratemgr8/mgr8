@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/kenji-yamane/mgr8/domain"
 )
@@ -28,7 +29,7 @@ func hasSingleArg(datatype string) bool {
 }
 
 func hasDoubleArg(datatype string) bool {
-	doubleArgTypes := []string{"decimal"}
+	doubleArgTypes := []string{"decimal", "numeric"}
 	if inStringList(doubleArgTypes, datatype) {
 		return true
 	}	else {
@@ -37,27 +38,35 @@ func hasDoubleArg(datatype string) bool {
 }
 
 func (d *deparser) CreateTable(table *domain.Table) string {
-	string := fmt.Sprintf("CREATE TABLE %s (", table.Name)
+ 	statement := fmt.Sprintf("CREATE TABLE %s (\n", table.Name)
 
-	for columnName, column := range table.Columns {
-		string = string + fmt.Sprintf("%s %s", columnName, column.Datatype)
+	columnKeys := []string{}
+	for columnName, _ := range table.Columns {
+		columnKeys = append(columnKeys, columnName)
+	}
+	sort.Strings(columnKeys)
+
+	for _, key := range columnKeys {
+		column := table.Columns[key]
+
+		statement = statement + fmt.Sprintf("%s %s", key, column.Datatype)
 
 		if hasSingleArg(column.Datatype) {
-			string = string + fmt.Sprintf("(%s)", column.Datatype, column.Parameters["size"])
+			statement = statement + fmt.Sprintf("(%d)", column.Parameters["size"])
 		} else if hasDoubleArg(column.Datatype) {
-			string = string + fmt.Sprintf("(%s,%s)", column.Datatype, column.Parameters["precision"], column.Parameters["scale"])
+			statement = statement + fmt.Sprintf("(%d,%d)", column.Parameters["precision"], column.Parameters["scale"])
 		}
 
 		if column.IsNotNull {
-			string = string + fmt.Sprintf(" NOT NULL")
+			statement = statement + fmt.Sprintf(" NOT NULL")
 		}
 
-		string = string + fmt.Sprintf(",")
+		statement = statement + fmt.Sprintf(",\n")
 	}
 
-	string = string[0:len(string) - 2]
-	string = string + fmt.Sprintf(")")
-	return string
+	statement = statement[0:len(statement) - 2]
+	statement = statement + fmt.Sprintf("\n)")
+	return statement
 }
 
 func (d *deparser) DropTable(tableName string) string {
