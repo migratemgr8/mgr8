@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"strings"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -10,6 +12,7 @@ import (
 var _ = Describe("MySql Driver", func() {
 	var (
 		subject *mySqlDriver
+		dp      *deparser
 	)
 
 	Context("Parse Migration", func() {
@@ -53,6 +56,77 @@ var _ = Describe("MySql Driver", func() {
 						"user_phones": {SQL: ""},
 					},
 				}))
+			})
+		})
+	})
+
+	Context("Deparse Migration", func() {
+		BeforeEach(func() {
+			dp = &deparser{}
+		})
+
+		When("New schema has a new column", func() {
+			It("Creates alter table statement for column", func() {
+				column := &domain.Column{
+					Datatype:   "int",
+					IsNotNull:  false,
+					Parameters: map[string]interface{}{},
+				}
+				stmt := dp.AddColumn("tbl", "col", column)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col int"))
+			})
+
+			It("Identifies not null property", func() {
+				column := &domain.Column{
+					Datatype:   "char",
+					IsNotNull:  true,
+					Parameters: map[string]interface{}{},
+				}
+				stmt := dp.AddColumn("tbl", "col", column)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col char not null"))
+			})
+
+			It("Places correct parameters in column definition", func() {
+				column := &domain.Column{
+					Datatype:   "varchar",
+					IsNotNull:  false,
+					Parameters: map[string]interface{}{"size": 10},
+				}
+				stmt := dp.AddColumn("tbl", "col", column)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col varchar(10)"))
+			})
+		})
+
+		When("New schema doesn't have a column", func() {
+			It("Drops the column completly", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := dp.DropColumn(tableName, columnName)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl drop column col"))
+			})
+		})
+
+		When("A column changes its null property", func() {
+			It("Makes a int null column become not null", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := dp.MakeColumnNotNull(tableName, columnName)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl modify col int not null"))
+			})
+
+			It("Makes a int not null column become null", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := dp.UnmakeColumnNotNull(tableName, columnName)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl modify col int null"))
+			})
+		})
+
+		When("New schema doesn't have a table", func() {
+			It("Drops the table", func() {
+				tableName := "tbl"
+				stmt := dp.DropTable(tableName)
+				Expect(strings.ToLower(stmt)).To(Equal("drop table if exists tbl"))
 			})
 		})
 	})

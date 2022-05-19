@@ -22,6 +22,9 @@ func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column
 	if size, ok := column.Parameters["size"]; ok {
 		columnDatatype = fmt.Sprintf("%s(%d)", column.Datatype, size)
 	}
+	if column.IsNotNull {
+		columnDatatype = fmt.Sprintf("%s NOT NULL", columnDatatype)
+	}
 	return fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %v", tableName, columnName, columnDatatype)
 }
 
