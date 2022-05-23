@@ -1,13 +1,13 @@
 package applications
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
 	"strings"
 )
 
-type userNameService struct { }
+type userNameService struct{}
 
 func NewUserNameService() *userNameService {
 	return &userNameService{}
@@ -23,7 +23,7 @@ func (a *userNameService) GetUserName() (string, error) {
 
 	MGR8CONFIG_FILEPATH := user_home_directory + "/.mgr8config"
 	mgr8config, err := os.Open(MGR8CONFIG_FILEPATH)
-	
+
 	// close the file with defer
 	defer mgr8config.Close()
 	var username string
@@ -32,36 +32,36 @@ func (a *userNameService) GetUserName() (string, error) {
 		// get username from .mgr8config
 		scanner := bufio.NewScanner(mgr8config)
 		// reading file line by line
-    		for scanner.Scan() {
+		for scanner.Scan() {
 			key, value := GetKeyValueFromMgr8Config(scanner.Text())
 			if key == "name" {
 				username = value
 			}
-    		}
- 
-    		if err := scanner.Err(); err != nil {
-        		return "", err
-    		}
+		}
+
+		if err := scanner.Err(); err != nil {
+			return "", err
+		}
 
 		return username, nil
 	} else {
-		// create .mgr8config file 
+		// create .mgr8config file
 		mgr8config, err := os.Create(MGR8CONFIG_FILEPATH)
 		if err != nil {
 			return "", err
 		}
-	
+
 		// close the file with defer
 		defer mgr8config.Close()
 
-		hostname, err := os.Hostname()  
+		hostname, err := os.Hostname()
 		if err != nil {
 			return "", err
 		}
 
 		fmt.Println("File .mgr8config not found. Please enter your username (without whitespaces):")
 		fmt.Scanf("%s", &username)
- 
+
 		// write a string on file
 		mgr8config.WriteString("[user]\n\tname = " + username + "\n\tdevice_name = " + hostname + "\n")
 

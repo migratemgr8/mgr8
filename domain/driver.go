@@ -37,4 +37,6 @@ type Deparser interface {
 
 	MakeColumnNotNull(tableName, columnName string) string
 	UnmakeColumnNotNull(tableName, columnName string) string
+
+	WriteScript(statements []string) string
 }

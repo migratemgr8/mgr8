@@ -1,25 +1,30 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/kenji-yamane/mgr8/applications"
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
 type generate struct{}
 
 func (g *generate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
-	filePath := args[0]
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("could not read from file with path: %s", err)
-	}
+	newSchemaPath := args[0]
 
-	_, err = driver.ParseMigration(string(content))
-	if err != nil {
-		return err
-	}
+	// TODO: get this from schemas folder
+	oldSchemaPath := args[1]
 
-	return nil
+	// TODO: get these as "(highest migration + 1)_timestamp.up/down.sql
+	upMigrationOutputFile := args[2]
+	downMigrationOutputFile := args[3]
+
+	fileService := applications.NewFileService()
+
+	generateCommand := applications.NewGenerateCommand(driver, fileService)
+
+	return generateCommand.Execute(&applications.GenerateParameters{
+		OldSchemaPath:         oldSchemaPath,
+		NewSchemaPath:         newSchemaPath,
+		UpMigrationFilename:   upMigrationOutputFile,
+		DownMigrationFilename: downMigrationOutputFile,
+	})
 }

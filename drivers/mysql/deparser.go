@@ -6,7 +6,7 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
-type deparser struct { }
+type deparser struct{}
 
 func (d *deparser) CreateTable(table *domain.Table) string {
 	// TODO: how to mount this string?
@@ -31,4 +31,12 @@ func (d *deparser) MakeColumnNotNull(tableName, columnName string) string {
 
 func (d *deparser) UnmakeColumnNotNull(tableName, columnName string) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
+}
+
+func (d *deparser) WriteScript(statements []string) string {
+	var scriptContent string
+	for _, s := range statements {
+		scriptContent += s + ";\n"
+	}
+	return scriptContent
 }
