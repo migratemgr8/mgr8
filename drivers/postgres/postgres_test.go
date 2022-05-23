@@ -42,7 +42,7 @@ var _ = Describe("Postgres Driver", func() {
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},
 								"name":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(15)}},
-								"ddi":           {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
+								"ddi":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
 								"age":           {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
 								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
 							},

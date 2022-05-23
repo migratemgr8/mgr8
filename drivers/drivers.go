@@ -11,8 +11,8 @@ import (
 type DriverName string
 
 const (
-	MySql    DriverName = "mysql"
-	Postgres DriverName = "postgres"
+	MySql         DriverName = "mysql"
+	Postgres      DriverName = "postgres"
 )
 
 func GetDriver(driverName string) (domain.Driver, error) {

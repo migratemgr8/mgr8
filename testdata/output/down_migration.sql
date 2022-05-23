@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS products;
+ALTER TABLE users DROP COLUMN ddi;
