@@ -54,6 +54,8 @@ Execute migrations by running
 - [Asdf golang plugin](https://github.com/kennyp/asdf-golang)
 - [Docker compose](https://docs.docker.com/compose/install/)
 
+Run `make install-tools` to install tooling dependencies.
+
 ### Run a database container
 
 Run a testing database with
@@ -70,7 +72,11 @@ For postgres use DB_HOST=`postgres://root:root@localhost:5432/database_name?sslm
 
 ### Testing
 
+Use `make mock` to generate necessary mocks.
+
 Use `make test`, `make display-coverage` and `make coverage-report`.
+
+To add a new mock, add new lines to the `mock` command in the Makefile.
 
 ### Snippets
 
