@@ -1,6 +1,11 @@
 package applications
 
-import "github.com/kenji-yamane/mgr8/domain"
+import (
+	"log"
+
+	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/kenji-yamane/mgr8/infrastructure"
+)
 
 type GenerateCommand interface {
 	Execute(parameters *GenerateParameters) error
@@ -9,18 +14,17 @@ type GenerateCommand interface {
 type GenerateParameters struct {
 	OldSchemaPath string
 	NewSchemaPath string
-
-	UpMigrationFilename   string
-	DownMigrationFilename string
+	MigrationDir string
 }
 
 type generateCommand struct {
 	driver   domain.Driver
-	fService FileService
+	fService infrastructure.FileService
+	migrationFService MigrationFileService
 }
 
-func NewGenerateCommand(driver domain.Driver, fileService FileService) *generateCommand {
-	return &generateCommand{driver: driver, fService: fileService}
+func NewGenerateCommand(driver domain.Driver, fileService infrastructure.FileService, migrationFService MigrationFileService) *generateCommand {
+	return &generateCommand{driver: driver, fService: fileService, migrationFService: migrationFService}
 }
 
 func (g *generateCommand) Execute(parameters *GenerateParameters) error {
@@ -47,12 +51,22 @@ func (g *generateCommand) Execute(parameters *GenerateParameters) error {
 		downStatements = append(downStatements, diffQueue[i].Down(deparser))
 	}
 
-	err = g.writeStatementsToFile(parameters.UpMigrationFilename, upStatements)
+	nextMigration, err := g.migrationFService.GetNextMigration(parameters.MigrationDir)
 	if err != nil {
 		return err
 	}
 
-	err = g.writeStatementsToFile(parameters.DownMigrationFilename, downStatements)
+	upMigrationFilename := g.migrationFService.FormatFilename(nextMigration, "up")
+	downMigrationFilename := g.migrationFService.FormatFilename(nextMigration, "down")
+
+	log.Printf("Generating files %s and %s", upMigrationFilename, downMigrationFilename)
+
+	err = g.writeStatementsToFile(parameters.MigrationDir, upMigrationFilename, upStatements)
+	if err != nil {
+		return err
+	}
+
+	err = g.writeStatementsToFile(parameters.MigrationDir, downMigrationFilename, downStatements)
 	if err != nil {
 		return err
 	}
@@ -69,7 +83,7 @@ func (g *generateCommand) getSchemaFromFile(filename string) (*domain.Schema, er
 	return g.driver.ParseMigration(content)
 }
 
-func (g *generateCommand) writeStatementsToFile(filename string, statements []string) error {
+func (g *generateCommand) writeStatementsToFile(migrationDir, filename string, statements []string) error {
 	content := g.driver.Deparser().WriteScript(statements)
-	return g.fService.Write(filename, content)
+	return g.fService.Write(migrationDir, filename, content)
 }
