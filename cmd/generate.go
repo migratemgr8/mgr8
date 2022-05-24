@@ -22,12 +22,12 @@ func (g *generate) execute(args []string, databaseURL string, migrationsDir stri
 	generateCommand := applications.NewGenerateCommand(driver,
 		fileService,
 		applications.NewMigrationFileService(fileService, clock),
-		)
+	)
 
 	err := generateCommand.Execute(&applications.GenerateParameters{
-		OldSchemaPath:         oldSchemaPath,
-		NewSchemaPath:         newSchemaPath,
-		MigrationDir:   migrationsDir,
+		OldSchemaPath: oldSchemaPath,
+		NewSchemaPath: newSchemaPath,
+		MigrationDir:  migrationsDir,
 	})
 	if err != nil {
 		log.Print(err)

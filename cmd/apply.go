@@ -17,7 +17,7 @@ import (
 
 type apply struct{}
 
-// TODO: remove and replace with applciations.MigrationFile
+// TODO: replace file usage with infrastructure.FileService
 type MigrationFile struct {
 	fullPath string
 	name     string

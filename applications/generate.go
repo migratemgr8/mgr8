@@ -39,34 +39,20 @@ func (g *generateCommand) Execute(parameters *GenerateParameters) error {
 	}
 
 	diffQueue := newSchema.Diff(oldSchema)
-	deparser := g.driver.Deparser()
-
-	var upStatements []string
-	for _, diff := range diffQueue {
-		upStatements = append(upStatements, diff.Up(deparser))
-	}
-
-	var downStatements []string
-	for i := len(diffQueue) - 1; i >= 0; i-- {
-		downStatements = append(downStatements, diffQueue[i].Down(deparser))
-	}
+	upStatements := diffQueue.GetUpStatements(g.driver.Deparser())
+	downStatements := diffQueue.GetDownStatements(g.driver.Deparser())
 
 	nextMigration, err := g.migrationFService.GetNextMigration(parameters.MigrationDir)
 	if err != nil {
 		return err
 	}
 
-	upMigrationFilename := g.migrationFService.FormatFilename(nextMigration, "up")
-	downMigrationFilename := g.migrationFService.FormatFilename(nextMigration, "down")
-
-	log.Printf("Generating files %s and %s", upMigrationFilename, downMigrationFilename)
-
-	err = g.writeStatementsToFile(parameters.MigrationDir, upMigrationFilename, upStatements)
+	err = g.writeStatementsToFile(parameters.MigrationDir, upStatements, nextMigration, "up")
 	if err != nil {
 		return err
 	}
 
-	err = g.writeStatementsToFile(parameters.MigrationDir, downMigrationFilename, downStatements)
+	err = g.writeStatementsToFile(parameters.MigrationDir, downStatements, nextMigration,"down")
 	if err != nil {
 		return err
 	}
@@ -83,7 +69,9 @@ func (g *generateCommand) getSchemaFromFile(filename string) (*domain.Schema, er
 	return g.driver.ParseMigration(content)
 }
 
-func (g *generateCommand) writeStatementsToFile(migrationDir, filename string, statements []string) error {
+func (g *generateCommand) writeStatementsToFile(migrationDir string, statements []string, nextMigration int, migrationType string) error {
+	filename := g.migrationFService.FormatFilename(nextMigration, "up")
+	log.Printf("Generating file %s migration %s", migrationType, filename)
 	content := g.driver.Deparser().WriteScript(statements)
 	return g.fService.Write(migrationDir, filename, content)
 }
