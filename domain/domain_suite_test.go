@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestMySqlDriver(t *testing.T) {
+func TestDomain(t *testing.T) {
 	_t = t
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Domain Test Suite")
