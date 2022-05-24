@@ -397,3 +397,17 @@ func (mr *MockDeparserMockRecorder) UnmakeColumnNotNull(tableName, columnName in
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmakeColumnNotNull", reflect.TypeOf((*MockDeparser)(nil).UnmakeColumnNotNull), tableName, columnName)
 }
+
+// WriteScript mocks base method.
+func (m *MockDeparser) WriteScript(statements []string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteScript", statements)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// WriteScript indicates an expected call of WriteScript.
+func (mr *MockDeparserMockRecorder) WriteScript(statements interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteScript", reflect.TypeOf((*MockDeparser)(nil).WriteScript), statements)
+}
