@@ -12,6 +12,10 @@ install-tools:
 test:
 	go test ./... -coverprofile=unit_coverage.out
 
+.PHONY: test-codecov
+test-codecov:
+	go test ./... -coverprofile=coverage.txt
+
 .PHONY: coverage-report
 coverage-report:
 	go tool cover -html=unit_coverage.out
