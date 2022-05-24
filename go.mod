@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/pingcap/parser v0.0.0-20210831085004-b5390aa83f65
 	github.com/pingcap/tidb v1.1.0-beta.0.20220418060002-fe5aa9760b58
 )
