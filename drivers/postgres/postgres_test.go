@@ -109,14 +109,16 @@ var _ = Describe("Postgres Driver", func() {
 			It("Makes a int null column become not null", func() {
 				columnName := "col"
 				tableName := "tbl"
-				stmt := dp.MakeColumnNotNull(tableName, columnName)
+				column := &domain.Column{Datatype: "int", IsNotNull: false}
+				stmt := dp.MakeColumnNotNull(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set not null"))
 			})
 
 			It("Makes a int not null column become null", func() {
 				columnName := "col"
 				tableName := "tbl"
-				stmt := dp.UnmakeColumnNotNull(tableName, columnName)
+				column := &domain.Column{Datatype: "int", IsNotNull: false}
+				stmt := dp.UnmakeColumnNotNull(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col drop not null"))
 			})
 		})

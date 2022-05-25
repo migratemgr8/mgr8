@@ -17,24 +17,46 @@ func (d *deparser) DropTable(tableName string) string {
 	return fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)
 }
 
-func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column) string {
+func (d *deparser) ColumnDatatype(columnName string, column *domain.Column) string {
 	columnDatatype := column.Datatype
 	if size, ok := column.Parameters["size"]; ok {
 		columnDatatype = fmt.Sprintf("%s(%d)", column.Datatype, size)
 	}
+	return fmt.Sprintf("%s %v", columnName, columnDatatype)
+}
+
+func (d *deparser) ColumnDefinition(columnName string, column *domain.Column) string {
+	columnDefinition := d.ColumnDatatype(columnName, column)
 	if column.IsNotNull {
-		columnDatatype = fmt.Sprintf("%s NOT NULL", columnDatatype)
+		columnDefinition = fmt.Sprintf("%s NOT NULL", columnDefinition)
 	}
-	return fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %v", tableName, columnName, columnDatatype)
+	return columnDefinition
+}
+
+func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column) string {
+	columnDefinition := d.ColumnDefinition(columnName, column)
+	return fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s", tableName, columnDefinition)
 }
 
 func (d *deparser) DropColumn(tableName, columnName string) string {
 	return fmt.Sprintf("ALTER TABLE %s DROP COLUMN %s", tableName, columnName)
 }
-func (d *deparser) MakeColumnNotNull(tableName, columnName string) string {
-	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET NOT NULL", tableName, columnName)
+func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
+	newColumn := &domain.Column{
+		Datatype:   column.Datatype,
+		Parameters: column.Parameters,
+		IsNotNull:  true,
+	}
+	columnDatatype := d.ColumnDatatype(columnName, newColumn)
+	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NOT NULL", tableName, columnDatatype)
 }
 
-func (d *deparser) UnmakeColumnNotNull(tableName, columnName string) string {
-	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
+func (d *deparser) UnmakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
+	newColumn := &domain.Column{
+		Datatype:   column.Datatype,
+		Parameters: column.Parameters,
+		IsNotNull:  false,
+	}
+	columnDatatype := d.ColumnDatatype(columnName, newColumn)
+	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NULL", tableName, columnDatatype)
 }

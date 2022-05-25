@@ -31,10 +31,10 @@ func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column
 func (d *deparser) DropColumn(tableName, columnName string) string {
 	return fmt.Sprintf("ALTER TABLE %s DROP COLUMN %s", tableName, columnName)
 }
-func (d *deparser) MakeColumnNotNull(tableName, columnName string) string {
+func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET NOT NULL", tableName, columnName)
 }
 
-func (d *deparser) UnmakeColumnNotNull(tableName, columnName string) string {
+func (d *deparser) UnmakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
 }
