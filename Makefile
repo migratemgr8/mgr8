@@ -10,17 +10,13 @@ install-tools:
 
 .PHONY: test
 test:
-	go test ./... -coverprofile=unit_coverage.out
-
-.PHONY: test-codecov
-test-codecov:
 	go test ./... -coverprofile=coverage.txt
 
 .PHONY: coverage-report
 coverage-report:
-	go tool cover -html=unit_coverage.out
+	go tool cover -html=coverage.txt
 
-UNIT_COVERAGE:= $(shell go tool cover -func=unit_coverage.out | tail -n 1 | cut -d ' ' -f 3 | rev | cut -c 1-5 | rev)
+UNIT_COVERAGE:= $(shell go tool cover -func=coverage.txt | tail -n 1 | cut -d ' ' -f 3 | rev | cut -c 1-5 | rev)
 
 .PHONY: display-coverage
 display-coverage:

@@ -13,6 +13,6 @@ jobs:
     - name: Build
       run: make build
     - name: Run tests
-      run: make test-codecov
+      run: make test
     - name: Upload coverage reports to Codecov with GitHub Action
       run: bash <(curl -s https://codecov.io/bash) -X fix
