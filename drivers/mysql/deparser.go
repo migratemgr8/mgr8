@@ -51,7 +51,7 @@ func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domai
 	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NOT NULL", tableName, columnDatatype)
 }
 
-func (d *deparser) UnmakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
+func (d *deparser) MakeColumnNullable(tableName, columnName string, column *domain.Column) string {
 	newColumn := &domain.Column{
 		Datatype:   column.Datatype,
 		Parameters: column.Parameters,
