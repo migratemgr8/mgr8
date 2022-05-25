@@ -123,7 +123,7 @@ var _ = Describe("Postgres Driver", func() {
 				columnName := "col"
 				tableName := "tbl"
 				column := &domain.Column{Datatype: "int", IsNotNull: false}
-				stmt := subject.UnmakeColumnNotNull(tableName, columnName, column)
+				stmt := subject.MakeColumnNullable(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col drop not null"))
 			})
 		})

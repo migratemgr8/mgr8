@@ -69,7 +69,7 @@ var _ = Describe("Schema Diff", func() {
 		})
 
 		When("Column switches to nullable", func() {
-			It("Returns UnmakeColumnNotNull", func() {
+			It("Returns MakeColumnNullable", func() {
 				oldSchema := &Schema{
 					Tables: map[string]*Table{
 						"table": NewTable("table", map[string]*Column{
@@ -90,7 +90,7 @@ var _ = Describe("Schema Diff", func() {
 				diffQueue := newSchema.Diff(oldSchema)
 				Expect(diffQueue).To(HaveLen(1))
 				Expect(diffQueue).To(ContainElements(
-					NewUnmakeColumnNotNullDiff("table", "column"),
+					NewMakeColumnNullableDiff("table", "column"),
 				))
 			})
 		})

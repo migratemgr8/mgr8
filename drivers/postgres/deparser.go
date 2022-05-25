@@ -32,13 +32,13 @@ func hasDoubleArg(datatype string) bool {
 	doubleArgTypes := []string{"decimal", "numeric"}
 	if inStringList(doubleArgTypes, datatype) {
 		return true
-	}	else {
+	} else {
 		return false
 	}
 }
 
 func (d *deparser) CreateTable(table *domain.Table) string {
- 	statement := fmt.Sprintf("CREATE TABLE %s (\n", table.Name)
+	statement := fmt.Sprintf("CREATE TABLE %s (\n", table.Name)
 
 	columnKeys := []string{}
 	for columnName, _ := range table.Columns {
@@ -64,7 +64,7 @@ func (d *deparser) CreateTable(table *domain.Table) string {
 		statement = statement + fmt.Sprintf(",\n")
 	}
 
-	statement = statement[0:len(statement) - 2]
+	statement = statement[0 : len(statement)-2]
 	statement = statement + fmt.Sprintf("\n)")
 	return statement
 }
@@ -91,6 +91,6 @@ func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domai
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET NOT NULL", tableName, columnName)
 }
 
-func (d *deparser) UnmakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
+func (d *deparser) MakeColumnNullable(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
 }

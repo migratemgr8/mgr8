@@ -36,5 +36,5 @@ type Deparser interface {
 	DropColumn(tableName, columnName string) string
 
 	MakeColumnNotNull(tableName, columnName string, column *Column) string
-	UnmakeColumnNotNull(tableName, columnName string, column *Column) string
+	MakeColumnNullable(tableName, columnName string, column *Column) string
 }

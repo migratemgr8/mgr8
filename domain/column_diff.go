@@ -51,23 +51,23 @@ func (m *MakeColumnNotNullDiff) Up(deparser Deparser) string {
 }
 
 func (m *MakeColumnNotNullDiff) Down(deparser Deparser) string {
-	return deparser.UnmakeColumnNotNull(m.tableName, m.columnName, m.column)
+	return deparser.MakeColumnNullable(m.tableName, m.columnName, m.column)
 }
 
-type UnmakeColumnNotNullDiff struct {
+type MakeColumnNullableDiff struct {
 	tableName  string
 	columnName string
 	column     *Column
 }
 
-func NewUnmakeColumnNotNullDiff(tableName string, columnName string) *UnmakeColumnNotNullDiff {
-	return &UnmakeColumnNotNullDiff{tableName: tableName, columnName: columnName}
+func NewMakeColumnNullableDiff(tableName string, columnName string) *MakeColumnNullableDiff {
+	return &MakeColumnNullableDiff{tableName: tableName, columnName: columnName}
 }
 
-func (m *UnmakeColumnNotNullDiff) Up(deparser Deparser) string {
-	return deparser.UnmakeColumnNotNull(m.tableName, m.columnName, m.column)
+func (m *MakeColumnNullableDiff) Up(deparser Deparser) string {
+	return deparser.MakeColumnNullable(m.tableName, m.columnName, m.column)
 }
 
-func (m *UnmakeColumnNotNullDiff) Down(deparser Deparser) string {
+func (m *MakeColumnNullableDiff) Down(deparser Deparser) string {
 	return deparser.MakeColumnNotNull(m.tableName, m.columnName, m.column)
 }

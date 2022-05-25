@@ -54,7 +54,7 @@ func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) [
 		if column.IsNotNull {
 			diffsQueue = append(diffsQueue, NewMakeColumnNotNullDiff(table.Name, columnName))
 		} else {
-			diffsQueue = append(diffsQueue, NewUnmakeColumnNotNullDiff(table.Name, columnName))
+			diffsQueue = append(diffsQueue, NewMakeColumnNullableDiff(table.Name, columnName))
 		}
 	}
 	return diffsQueue
