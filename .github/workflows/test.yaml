@@ -1,6 +1,10 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
@@ -15,4 +19,5 @@ jobs:
     - name: Run tests
       run: make test
     - name: Upload coverage reports to Codecov with GitHub Action
-      run: bash <(curl -s https://codecov.io/bash) -X fix
+      run: curl -Os https://uploader.codecov.io/latest/linux/codecov
+      run: chmod +x codecov ./codecov -t ${CODECOV_TOKEN}
