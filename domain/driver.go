@@ -32,11 +32,11 @@ type Deparser interface {
 	CreateTable(table *Table) string
 	DropTable(tableName string) string
 
-	AddColumn() string
+	AddColumn(tableName, columnName string, column *Column) string
 	DropColumn(tableName, columnName string) string
 
-	MakeColumnNotNull(tableName, columnName string) string
-	UnmakeColumnNotNull(tableName, columnName string) string
+	MakeColumnNotNull(tableName, columnName string, column *Column) string
+	MakeColumnNullable(tableName, columnName string, column *Column) string
 
 	WriteScript(statements []string) string
 }
