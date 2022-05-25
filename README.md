@@ -47,6 +47,15 @@ Execute migrations by running
 ```
 - number_of_migrations: Number of migrations to run (Optional). If not specified, runs only one.
 
+### Run with docker
+
+Build the docker image with `make build-docker-image`
+
+Run commands:
+```bash
+docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} mgr8 <command> --dir=./migrations --database={{ database connection string }}
+```
+Make sure to replace the variables surrounded by double curly braces.
 ## Develop
 
 ### Requirements
