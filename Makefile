@@ -5,6 +5,9 @@ GOLANG_CROSS_VERSION ?= v1.17.6
 build: main.go
 	go build -o bin/mgr8 main.go
 
+install-tools:
+	go install github.com/golang/mock/mockgen@v1.6.0
+
 .PHONY: test
 test:
 	go test ./... -coverprofile=unit_coverage.out
@@ -37,3 +40,5 @@ release:
 		goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
 		release --rm-dist
 
+mock:
+	@mockgen -source=domain/driver.go -destination=domain/driver_mock.go -package=domain

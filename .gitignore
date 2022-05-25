@@ -1,5 +1,7 @@
 bin/
 .idea
 .vscode
-.release-env
 unit_coverage.out
+
+dist
+.release-env

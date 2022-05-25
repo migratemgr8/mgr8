@@ -10,12 +10,12 @@ import (
 )
 
 var _ = Describe("Postgres Driver", func() {
-	var (
-		subject *postgresDriver
-		dp      *deparser
-	)
 
 	Context("Parse Migration", func() {
+		var (
+			subject *postgresDriver
+		)
+
 		BeforeEach(func() {
 			subject = NewPostgresDriver()
 		})
@@ -60,8 +60,13 @@ var _ = Describe("Postgres Driver", func() {
 	})
 
 	Context("Deparse Migration", func() {
+
+		var (
+			subject *deparser
+		)
+
 		BeforeEach(func() {
-			dp = &deparser{}
+			subject = &deparser{}
 		})
 
 		When("New schema has a new column", func() {
@@ -71,7 +76,7 @@ var _ = Describe("Postgres Driver", func() {
 					IsNotNull:  false,
 					Parameters: map[string]interface{}{},
 				}
-				stmt := dp.AddColumn("tbl", "col", column)
+				stmt := subject.AddColumn("tbl", "col", column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col int"))
 			})
 
@@ -81,7 +86,7 @@ var _ = Describe("Postgres Driver", func() {
 					IsNotNull:  true,
 					Parameters: map[string]interface{}{},
 				}
-				stmt := dp.AddColumn("tbl", "col", column)
+				stmt := subject.AddColumn("tbl", "col", column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col char not null"))
 			})
 
@@ -91,7 +96,7 @@ var _ = Describe("Postgres Driver", func() {
 					IsNotNull:  false,
 					Parameters: map[string]interface{}{"size": 10},
 				}
-				stmt := dp.AddColumn("tbl", "col", column)
+				stmt := subject.AddColumn("tbl", "col", column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl add column col varchar(10)"))
 			})
 		})
@@ -100,7 +105,7 @@ var _ = Describe("Postgres Driver", func() {
 			It("Drops the column completly", func() {
 				columnName := "col"
 				tableName := "tbl"
-				stmt := dp.DropColumn(tableName, columnName)
+				stmt := subject.DropColumn(tableName, columnName)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl drop column col"))
 			})
 		})
@@ -110,7 +115,7 @@ var _ = Describe("Postgres Driver", func() {
 				columnName := "col"
 				tableName := "tbl"
 				column := &domain.Column{Datatype: "int", IsNotNull: false}
-				stmt := dp.MakeColumnNotNull(tableName, columnName, column)
+				stmt := subject.MakeColumnNotNull(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set not null"))
 			})
 
@@ -118,7 +123,7 @@ var _ = Describe("Postgres Driver", func() {
 				columnName := "col"
 				tableName := "tbl"
 				column := &domain.Column{Datatype: "int", IsNotNull: false}
-				stmt := dp.UnmakeColumnNotNull(tableName, columnName, column)
+				stmt := subject.UnmakeColumnNotNull(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col drop not null"))
 			})
 		})
@@ -126,8 +131,50 @@ var _ = Describe("Postgres Driver", func() {
 		When("New schema doesn't have a table", func() {
 			It("Drops the table", func() {
 				tableName := "tbl"
-				stmt := dp.DropTable(tableName)
+				stmt := subject.DropTable(tableName)
 				Expect(strings.ToLower(stmt)).To(Equal("drop table if exists tbl"))
+			})
+		})
+
+		When("Table has 1 as maximum argument in data type", func() {
+			It("Generate CREATE TABLE statement", func() {
+				table := &domain.Table{
+					Name: "users",
+					Columns: map[string]*domain.Column{
+						"social_number":   {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
+						"favorite_number": {Datatype: "bit", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(6)}},
+						"size":            {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
+					},
+				}
+
+				statement := subject.CreateTable(table)
+				answer := `CREATE TABLE users (
+favorite_number bit(6),
+size int4,
+social_number varchar(9)
+)`
+				Expect(statement).To(Equal(answer))
+			})
+		})
+
+		When("Table has 2 as maximum argument in data type", func() {
+			It("Generate CREATE TABLE statement", func() {
+				table := &domain.Table{
+					Name: "users",
+					Columns: map[string]*domain.Column{
+						"area":      {Datatype: "decimal", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(9), "scale": int32(1)}},
+						"perimeter": {Datatype: "numeric", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(6), "scale": int32(4)}},
+						"name":      {Datatype: "char", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(10)}},
+					},
+				}
+
+				statement := subject.CreateTable(table)
+				answer := `CREATE TABLE users (
+area decimal(9,1),
+name char(10),
+perimeter numeric(6,4)
+)`
+				Expect(statement).To(Equal(answer))
 			})
 		})
 	})

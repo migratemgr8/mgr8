@@ -9,11 +9,11 @@ import (
 
 type generate struct{}
 
-func (g *generate) execute(args []string, databaseURL string, driver domain.Driver) error {
-	fileName := args[0]
-	content, err := os.ReadFile(fileName)
+func (g *generate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+	filePath := args[0]
+	content, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("could not read from file: %s", err)
+		return fmt.Errorf("could not read from file with path: %s", err)
 	}
 
 	_, err = driver.ParseMigration(string(content))

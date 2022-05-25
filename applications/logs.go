@@ -10,17 +10,18 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
-func GetPreviousMigrationNumber(driver domain.Driver) (int, error) {
-	hasTables, err := driver.HasBaseTable()
-
+func CheckAndInstallTool(driver domain.Driver) error {
+	isToolInstalled, err := driver.IsToolInstalled()
 	if err != nil {
-		return 0, err
+		return err
 	}
-	if hasTables {
-		return driver.GetLatestMigration()
+
+	if !isToolInstalled {
+		fmt.Printf("Installing mgr8 into the database...\n")
+		return driver.InstallTool()
 	}
-	fmt.Printf("Installing mgr8 into the database...\n")
-	return 0, driver.CreateBaseTable()
+
+	return nil
 }
 
 func GetMigrationNumber(itemName string) (int, error) {
