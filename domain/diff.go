@@ -1,6 +1,6 @@
 package domain
 
-type Diff interface{
+type Diff interface {
 	Up(driver Deparser) string
 	Down(driver Deparser) string
 }
@@ -32,7 +32,7 @@ func (t *Table) Diff(originalTable *Table) []Diff {
 	for columnName, column := range t.Columns {
 		originalColumn, originalHasColumn := originalTable.Columns[columnName]
 		if !originalHasColumn {
-			diffsQueue = append(diffsQueue, NewCreateColumnDiff(t.Name, column))
+			diffsQueue = append(diffsQueue, NewCreateColumnDiff(t.Name, columnName, column))
 		} else {
 			diffsQueue = append(diffsQueue, column.Diff(t, columnName, originalColumn)...)
 		}
@@ -54,7 +54,7 @@ func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) [
 		if column.IsNotNull {
 			diffsQueue = append(diffsQueue, NewMakeColumnNotNullDiff(table.Name, columnName))
 		} else {
-		 	diffsQueue = append(diffsQueue, NewUnmakeColumnNotNullDiff(table.Name, columnName))
+			diffsQueue = append(diffsQueue, NewMakeColumnNullableDiff(table.Name, columnName))
 		}
 	}
 	return diffsQueue
