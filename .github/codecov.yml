@@ -1,7 +1,10 @@
 coverage:
   status:
     patch: off
-
+    project:
+      default:
+        target: auto # auto will use the coverage from the base commit (pull request base or parent commit) coverage to compare against.
+        threshold: 0%
 comment:                  # this is a top-level key
   layout: "reach, diff, flags, files"
   behavior: default
