@@ -315,17 +315,17 @@ func (m *MockDeparser) EXPECT() *MockDeparserMockRecorder {
 }
 
 // AddColumn mocks base method.
-func (m *MockDeparser) AddColumn() string {
+func (m *MockDeparser) AddColumn(tableName, columnName string, column *Column) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddColumn")
+	ret := m.ctrl.Call(m, "AddColumn", tableName, columnName, column)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // AddColumn indicates an expected call of AddColumn.
-func (mr *MockDeparserMockRecorder) AddColumn() *gomock.Call {
+func (mr *MockDeparserMockRecorder) AddColumn(tableName, columnName, column interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddColumn", reflect.TypeOf((*MockDeparser)(nil).AddColumn))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddColumn", reflect.TypeOf((*MockDeparser)(nil).AddColumn), tableName, columnName, column)
 }
 
 // CreateTable mocks base method.
@@ -371,29 +371,29 @@ func (mr *MockDeparserMockRecorder) DropTable(tableName interface{}) *gomock.Cal
 }
 
 // MakeColumnNotNull mocks base method.
-func (m *MockDeparser) MakeColumnNotNull(tableName, columnName string) string {
+func (m *MockDeparser) MakeColumnNotNull(tableName, columnName string, column *Column) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeColumnNotNull", tableName, columnName)
+	ret := m.ctrl.Call(m, "MakeColumnNotNull", tableName, columnName, column)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // MakeColumnNotNull indicates an expected call of MakeColumnNotNull.
-func (mr *MockDeparserMockRecorder) MakeColumnNotNull(tableName, columnName interface{}) *gomock.Call {
+func (mr *MockDeparserMockRecorder) MakeColumnNotNull(tableName, columnName, column interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeColumnNotNull", reflect.TypeOf((*MockDeparser)(nil).MakeColumnNotNull), tableName, columnName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeColumnNotNull", reflect.TypeOf((*MockDeparser)(nil).MakeColumnNotNull), tableName, columnName, column)
 }
 
-// UnmakeColumnNotNull mocks base method.
-func (m *MockDeparser) UnmakeColumnNotNull(tableName, columnName string) string {
+// MakeColumnNullable mocks base method.
+func (m *MockDeparser) MakeColumnNullable(tableName, columnName string, column *Column) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UnmakeColumnNotNull", tableName, columnName)
+	ret := m.ctrl.Call(m, "MakeColumnNullable", tableName, columnName, column)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// UnmakeColumnNotNull indicates an expected call of UnmakeColumnNotNull.
-func (mr *MockDeparserMockRecorder) UnmakeColumnNotNull(tableName, columnName interface{}) *gomock.Call {
+// MakeColumnNullable indicates an expected call of MakeColumnNullable.
+func (mr *MockDeparserMockRecorder) MakeColumnNullable(tableName, columnName, column interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmakeColumnNotNull", reflect.TypeOf((*MockDeparser)(nil).UnmakeColumnNotNull), tableName, columnName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeColumnNullable", reflect.TypeOf((*MockDeparser)(nil).MakeColumnNullable), tableName, columnName, column)
 }

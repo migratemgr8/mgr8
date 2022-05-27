@@ -1,43 +1,45 @@
 package domain
 
 type CreateColumnDiff struct {
-	tableName string
+	tableName  string
 	columnName string
-	column *Column
+	column     *Column
 }
 
-func NewCreateColumnDiff(tableName string, column *Column) *CreateColumnDiff {
-	return &CreateColumnDiff{tableName: tableName, column: column}
+func NewCreateColumnDiff(tableName, columnName string, column *Column) *CreateColumnDiff {
+	return &CreateColumnDiff{tableName: tableName, columnName: columnName, column: column}
 }
 
-func (d *CreateColumnDiff) Up(deparser Deparser) string{
-	return deparser.AddColumn()
+func (d *CreateColumnDiff) Up(deparser Deparser) string {
+	return deparser.AddColumn(d.tableName, d.columnName, d.column)
 }
 
-func (d *CreateColumnDiff) Down(deparser Deparser) string{
+func (d *CreateColumnDiff) Down(deparser Deparser) string {
 	return deparser.DropColumn(d.tableName, d.columnName)
 }
 
 type DropColumnDiff struct {
-	tableName string
+	tableName  string
 	columnName string
+	column     *Column
 }
 
 func NewDropColumnDiff(tableName string, columnName string) *DropColumnDiff {
 	return &DropColumnDiff{tableName: tableName, columnName: columnName}
 }
 
-func (d *DropColumnDiff) Up(deparser Deparser) string{
+func (d *DropColumnDiff) Up(deparser Deparser) string {
 	return deparser.DropColumn(d.tableName, d.columnName)
 }
 
-func (d *DropColumnDiff) Down(deparser Deparser) string{
-	return deparser.AddColumn()
+func (d *DropColumnDiff) Down(deparser Deparser) string {
+	return deparser.AddColumn(d.tableName, d.columnName, d.column)
 }
 
 type MakeColumnNotNullDiff struct {
-	tableName string
+	tableName  string
 	columnName string
+	column     *Column
 }
 
 func NewMakeColumnNotNullDiff(tableName string, columnName string) *MakeColumnNotNullDiff {
@@ -45,26 +47,27 @@ func NewMakeColumnNotNullDiff(tableName string, columnName string) *MakeColumnNo
 }
 
 func (m *MakeColumnNotNullDiff) Up(deparser Deparser) string {
-	return deparser.MakeColumnNotNull(m.tableName, m.columnName)
+	return deparser.MakeColumnNotNull(m.tableName, m.columnName, m.column)
 }
 
 func (m *MakeColumnNotNullDiff) Down(deparser Deparser) string {
-	return deparser.UnmakeColumnNotNull(m.tableName, m.columnName)
+	return deparser.MakeColumnNullable(m.tableName, m.columnName, m.column)
 }
 
-type UnmakeColumnNotNullDiff struct {
-	tableName string
+type MakeColumnNullableDiff struct {
+	tableName  string
 	columnName string
+	column     *Column
 }
 
-func NewUnmakeColumnNotNullDiff(tableName string, columnName string) *UnmakeColumnNotNullDiff {
-	return &UnmakeColumnNotNullDiff{tableName: tableName, columnName: columnName}
+func NewMakeColumnNullableDiff(tableName string, columnName string) *MakeColumnNullableDiff {
+	return &MakeColumnNullableDiff{tableName: tableName, columnName: columnName}
 }
 
-func (m *UnmakeColumnNotNullDiff) Up(deparser Deparser) string {
-	return deparser.UnmakeColumnNotNull(m.tableName, m.columnName)
+func (m *MakeColumnNullableDiff) Up(deparser Deparser) string {
+	return deparser.MakeColumnNullable(m.tableName, m.columnName, m.column)
 }
 
-func (m *UnmakeColumnNotNullDiff) Down(deparser Deparser) string {
-	return deparser.MakeColumnNotNull(m.tableName, m.columnName)
+func (m *MakeColumnNullableDiff) Down(deparser Deparser) string {
+	return deparser.MakeColumnNotNull(m.tableName, m.columnName, m.column)
 }
