@@ -20,4 +20,4 @@ jobs:
     - name: Run tests
       run: make test
     - name: Upload coverage reports to Codecov with GitHub Action
-      run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov ./codecov -t ${CODECOV_TOKEN}
+      run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
