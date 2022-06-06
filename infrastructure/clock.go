@@ -6,7 +6,7 @@ type Clock interface {
 	Now() time.Time
 }
 
-type realClock struct { }
+type realClock struct{}
 
 func NewClock() *realClock {
 	return &realClock{}

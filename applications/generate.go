@@ -12,12 +12,12 @@ type GenerateCommand interface {
 type GenerateParameters struct {
 	OldSchemaPath string
 	NewSchemaPath string
-	MigrationDir string
+	MigrationDir  string
 }
 
 type generateCommand struct {
-	driver   domain.Driver
-	fService infrastructure.FileService
+	driver            domain.Driver
+	fService          infrastructure.FileService
 	migrationFService MigrationFileService
 }
 
@@ -50,11 +50,10 @@ func (g *generateCommand) Execute(parameters *GenerateParameters) error {
 		return err
 	}
 
-	err = g.migrationFService.WriteStatementsToFile(parameters.MigrationDir, downStatements, nextMigration,"down")
+	err = g.migrationFService.WriteStatementsToFile(parameters.MigrationDir, downStatements, nextMigration, "down")
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-

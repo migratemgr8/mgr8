@@ -34,20 +34,6 @@ func (m *MockMigrationFileService) EXPECT() *MockMigrationFileServiceMockRecorde
 	return m.recorder
 }
 
-// FormatFilename mocks base method.
-func (m *MockMigrationFileService) FormatFilename(migrationNumber int, migrationType string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FormatFilename", migrationNumber, migrationType)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// FormatFilename indicates an expected call of FormatFilename.
-func (mr *MockMigrationFileServiceMockRecorder) FormatFilename(migrationNumber, migrationType interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FormatFilename", reflect.TypeOf((*MockMigrationFileService)(nil).FormatFilename), migrationNumber, migrationType)
-}
-
 // GetNextMigrationNumber mocks base method.
 func (m *MockMigrationFileService) GetNextMigrationNumber(dir string) (int, error) {
 	m.ctrl.T.Helper()
@@ -90,4 +76,41 @@ func (m *MockMigrationFileService) WriteStatementsToFile(migrationDir string, st
 func (mr *MockMigrationFileServiceMockRecorder) WriteStatementsToFile(migrationDir, statements, migrationNumber, migrationType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteStatementsToFile", reflect.TypeOf((*MockMigrationFileService)(nil).WriteStatementsToFile), migrationDir, statements, migrationNumber, migrationType)
+}
+
+// MockFileNameFormatter is a mock of FileNameFormatter interface.
+type MockFileNameFormatter struct {
+	ctrl     *gomock.Controller
+	recorder *MockFileNameFormatterMockRecorder
+}
+
+// MockFileNameFormatterMockRecorder is the mock recorder for MockFileNameFormatter.
+type MockFileNameFormatterMockRecorder struct {
+	mock *MockFileNameFormatter
+}
+
+// NewMockFileNameFormatter creates a new mock instance.
+func NewMockFileNameFormatter(ctrl *gomock.Controller) *MockFileNameFormatter {
+	mock := &MockFileNameFormatter{ctrl: ctrl}
+	mock.recorder = &MockFileNameFormatterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockFileNameFormatter) EXPECT() *MockFileNameFormatterMockRecorder {
+	return m.recorder
+}
+
+// FormatFilename mocks base method.
+func (m *MockFileNameFormatter) FormatFilename(arg0 int, arg1 string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FormatFilename", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// FormatFilename indicates an expected call of FormatFilename.
+func (mr *MockFileNameFormatterMockRecorder) FormatFilename(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FormatFilename", reflect.TypeOf((*MockFileNameFormatter)(nil).FormatFilename), arg0, arg1)
 }

@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Migration Scripts", func() {
 	var (
-		subject *migrationFileService
+		subject *fileNameFormatter
 	)
 	Context("Format Filename", func() {
 		var mockTime time.Time
@@ -34,8 +34,7 @@ var _ = Describe("Migration Scripts", func() {
 			mockTime = time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)
 
 			clock.EXPECT().Now().Return(mockTime)
-			fileService := infrastructure.NewMockFileService(ctrl)
-			subject = NewMigrationFileService(fileService, clock, domain.NewMockDriver(ctrl))
+			subject = NewFileNameFormatter(clock)
 		})
 		for _, testCase := range testCases {
 			When(fmt.Sprintf("Asked %s with number %d", testCase.migrationType, testCase.migrationNumber), func() {
@@ -46,6 +45,34 @@ var _ = Describe("Migration Scripts", func() {
 			})
 		}
 	})
+})
+
+var _ = Describe("Migration Scripts", func() {
+	var (
+		subject *migrationFileService
+	)
+
+	Context("WriteStatementsToFile", func() {
+		BeforeEach(func() {
+			ctrl := gomock.NewController(_t)
+			fileService := infrastructure.NewMockFileService(ctrl)
+			formatter := NewMockFileNameFormatter(ctrl)
+			formatter.EXPECT().FormatFilename(2, "type").Return("formatted_filename")
+			driver := domain.NewMockDriver(ctrl)
+
+			mockDeparser := domain.NewMockDeparser(ctrl)
+			driver.EXPECT().Deparser().Return(mockDeparser)
+			mockDeparser.EXPECT().WriteScript([]string{"statement"}).Return("sql")
+			fileService.EXPECT().Write("directory", "formatted_filename", "sql")
+			subject = NewMigrationFileService(fileService, formatter, driver)
+		})
+		When(fmt.Sprintf("Asked to generated"), func() {
+			It("Generates expected file", func() {
+				err := subject.WriteStatementsToFile("directory", []string{"statement"}, 2, "type")
+				Expect(err).To(BeNil())
+			})
+		})
+	})
 
 	Context("GetNextMigrationNumber", func() {
 		var fileService *infrastructure.MockFileService
@@ -53,7 +80,7 @@ var _ = Describe("Migration Scripts", func() {
 			ctrl := gomock.NewController(_t)
 			clock := infrastructure.NewMockClock(ctrl)
 			fileService = infrastructure.NewMockFileService(ctrl)
-			subject = NewMigrationFileService(fileService, clock, domain.NewMockDriver(ctrl))
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), domain.NewMockDriver(ctrl))
 		})
 		When("Has two migration files", func() {
 			It("Next migration number is 3", func() {
@@ -94,22 +121,22 @@ var _ = Describe("Migration Scripts", func() {
 	Context("GetSchemaFromFile", func() {
 		var (
 			fileService *infrastructure.MockFileService
-			driver *domain.MockDriver
+			driver      *domain.MockDriver
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
 			clock := infrastructure.NewMockClock(ctrl)
- 			fileService = infrastructure.NewMockFileService(ctrl)
+			fileService = infrastructure.NewMockFileService(ctrl)
 			driver = domain.NewMockDriver(ctrl)
-							subject = NewMigrationFileService(fileService, clock,driver )
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver)
 		})
 		When("Reads file successfully", func() {
 			It("Generates expected filename", func() {
 				fileService.EXPECT().Read("filename").Return("content", nil)
-				driver.EXPECT().ParseMigration("content").Return(&domain.Schema{ },nil)
+				driver.EXPECT().ParseMigration("content").Return(&domain.Schema{}, nil)
 				schema, err := subject.GetSchemaFromFile("filename")
 				Expect(err).To(BeNil())
-				Expect(schema).To(Equal(&domain.Schema{ }))
+				Expect(schema).To(Equal(&domain.Schema{}))
 			})
 		})
 		When("Reads file returns error", func() {
@@ -122,6 +149,5 @@ var _ = Describe("Migration Scripts", func() {
 			})
 		})
 	})
-
 
 })

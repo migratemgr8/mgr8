@@ -19,7 +19,7 @@ type FileService interface {
 	List(fileDirectory string) ([]MigrationFile, error)
 }
 
-type fileService struct { }
+type fileService struct{}
 
 func NewFileService() *fileService {
 	return &fileService{}
@@ -48,9 +48,10 @@ func (f *fileService) Read(filename string) (string, error) {
 	return string(content), nil
 }
 
-func (f *fileService) List(dir string) ([]MigrationFile, error){
+func (f *fileService) List(dir string) ([]MigrationFile, error) {
 	var migrationFiles []MigrationFile
-	{}
+	{
+	}
 
 	dirPath, err := filepath.Abs(dir)
 	if err != nil {

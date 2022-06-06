@@ -21,7 +21,7 @@ func (g *generate) execute(args []string, databaseURL string, migrationsDir stri
 
 	generateCommand := applications.NewGenerateCommand(
 		driver,
-		applications.NewMigrationFileService(fileService, clock, driver),
+		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver),
 	)
 
 	err := generateCommand.Execute(&applications.GenerateParameters{

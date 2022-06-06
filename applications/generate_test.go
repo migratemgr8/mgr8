@@ -17,7 +17,7 @@ var _ = Describe("Generate Command", func() {
 	Context("GetNextMigrationNumber", func() {
 		var (
 			driver                   *domain.MockDriver
-			deparser                   *domain.MockDeparser
+			deparser                 *domain.MockDeparser
 			migrationFileServiceMock *MockMigrationFileService
 		)
 		BeforeEach(func() {
@@ -28,8 +28,8 @@ var _ = Describe("Generate Command", func() {
 			deparser = domain.NewMockDeparser(ctrl)
 
 		})
-		When("Asked to execute", func(){
-			It("Succeeds", func(){
+		When("Asked to execute", func() {
+			It("Succeeds", func() {
 				driver.EXPECT().Deparser().Return(deparser).Times(2)
 				migrationFileServiceMock.EXPECT().GetSchemaFromFile("mock_old_path").Return(&domain.Schema{}, nil)
 				migrationFileServiceMock.EXPECT().GetSchemaFromFile("mock_new_path").Return(&domain.Schema{}, nil)
@@ -37,11 +37,11 @@ var _ = Describe("Generate Command", func() {
 
 				migrationFileServiceMock.EXPECT().
 					WriteStatementsToFile("mock_dir", gomock.Len(0), 3, "up").
-					Return( nil)
+					Return(nil)
 
 				migrationFileServiceMock.EXPECT().
 					WriteStatementsToFile("mock_dir", gomock.Len(0), 3, "down").
-					Return( nil)
+					Return(nil)
 
 				err := subject.Execute(&GenerateParameters{
 					OldSchemaPath: "mock_old_path",

@@ -2,7 +2,7 @@ package domain
 
 type DiffDeque []Diff
 
-func NewDiffDeque() DiffDeque{
+func NewDiffDeque() DiffDeque {
 	return []Diff{}
 }
 
