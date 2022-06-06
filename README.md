@@ -53,7 +53,7 @@ Build the docker image with `make build-docker-image`
 
 Run commands:
 ```bash
-docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} mgr8 <command> --dir=./migrations --database={{ database connection string }}
+docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} mgr8 <command>
 ```
 Make sure to replace the variables surrounded by double curly braces.
 ## Develop
@@ -92,10 +92,12 @@ To add a new mock, add new lines to the `mock` command in the Makefile.
 Executing migrations with postgres driver
 ```bash
 ./bin/mgr8 apply up --database=postgres://root:root@localhost:5432/core?sslmode=disable --dir=./migrations
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up
 ```
 
 Executing migrations with mysql driver
 ```bash
 ./bin/mgr8 apply up --database=root:root@tcp\(localhost:3306\)/core --dir=./migrations --driver=mysql
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up --driver=mysql
 ```
 
