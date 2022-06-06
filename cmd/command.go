@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/kenji-yamane/mgr8/domain"
@@ -27,8 +26,6 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Printf("Driver %s started\n", c.driverName)
 
 	err = c.cmd.execute(args, c.databaseURL, c.migrationsDir, driver)
 	if err != nil {

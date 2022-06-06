@@ -210,7 +210,6 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("User detected: " + username)
 
 	migrationType := "up"
 	if !migrations.isUpType {
