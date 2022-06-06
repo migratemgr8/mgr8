@@ -91,13 +91,17 @@ To add a new mock, add new lines to the `mock` command in the Makefile.
 
 Executing migrations with postgres driver
 ```bash
+# CLI version
 ./bin/mgr8 apply up --database=postgres://root:root@localhost:5432/core?sslmode=disable --dir=./migrations
+# Docker version
 docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up
 ```
 
 Executing migrations with mysql driver
 ```bash
+# CLI version
 ./bin/mgr8 apply up --database=root:root@tcp\(localhost:3306\)/core --dir=./migrations --driver=mysql
+# Docker version
 docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up --driver=mysql
 ```
 
