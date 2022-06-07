@@ -9,17 +9,17 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
 )
 
 var _ = Describe("Logs", func() {
 	Context("CheckAndInstallTool", func() {
 		var (
-			driver *domain.MockDriver
+			driver *domain_mock.MockDriver
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			driver = domain.NewMockDriver(ctrl)
+			driver = domain_mock.NewMockDriver(ctrl)
 		})
 		When("Driver has error", func() {
 			It("Returns error", func() {
