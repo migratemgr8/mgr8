@@ -22,17 +22,21 @@ var _ = Describe("Generate Command", func() {
 			driver                   *domain_mock.MockDriver
 			deparser                 *domain_mock.MockDeparser
 			migrationFileServiceMock *applications_mock.MockMigrationFileService
+			fileService *infrastructure_mock.MockFileService
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
 			driver = domain_mock.NewMockDriver(ctrl)
 			migrationFileServiceMock = applications_mock.NewMockMigrationFileService(ctrl)
-			subject = NewGenerateCommand(driver, migrationFileServiceMock, infrastructure_mock.NewMockFileService(ctrl))
+			fileService = infrastructure_mock.NewMockFileService(ctrl)
+			subject = NewGenerateCommand(driver, migrationFileServiceMock, fileService)
 			deparser = domain_mock.NewMockDeparser(ctrl)
 
 		})
 		When("Asked to execute", func() {
 			It("Succeeds", func() {
+				fileService.EXPECT().Read("mock_new_path").Return("content", nil)
+				fileService.EXPECT().Write(".mgr8", "reference.sql", "content")
 				driver.EXPECT().Deparser().Return(deparser).Times(2)
 				migrationFileServiceMock.EXPECT().GetSchemaFromFile("mock_old_path").Return(&domain.Schema{}, nil)
 				migrationFileServiceMock.EXPECT().GetSchemaFromFile("mock_new_path").Return(&domain.Schema{}, nil)
