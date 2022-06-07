@@ -50,8 +50,6 @@ func (f *fileService) Read(filename string) (string, error) {
 
 func (f *fileService) List(dir string) ([]MigrationFile, error) {
 	var migrationFiles []MigrationFile
-	{
-	}
 
 	dirPath, err := filepath.Abs(dir)
 	if err != nil {
