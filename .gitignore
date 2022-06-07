@@ -5,3 +5,4 @@ coverage.txt
 
 dist
 .release-env
+unit_coverage.out
