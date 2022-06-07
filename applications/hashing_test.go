@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Hashing", func() {
@@ -18,11 +18,11 @@ var _ = Describe("Hashing", func() {
 
 	Context("GetSqlHash", func() {
 		var (
-			mockFileService *infrastructure.MockFileService
+			mockFileService *infrastructure_mock.MockFileService
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			mockFileService = infrastructure.NewMockFileService(ctrl)
+			mockFileService = infrastructure_mock.NewMockFileService(ctrl)
 			subject = NewHashService(mockFileService)
 		})
 		When("Asked to execute", func() {

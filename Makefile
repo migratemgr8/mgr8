@@ -40,8 +40,9 @@ release:
 		goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
 		release --rm-dist
 
+.PHONY: mock
 mock:
-	@mockgen -source=domain/driver.go -destination=domain/driver_mock.go -package=domain
-	@mockgen -source=infrastructure/clock.go -destination=infrastructure/clock_mock.go -package=infrastructure
-	@mockgen -source=infrastructure/file.go -destination=infrastructure/file_mock.go -package=infrastructure
-	@mockgen -source=applications/migrationscripts.go -destination=applications/migrationscripts_mock.go -package=applications
+	@mockgen -source=domain/driver.go -destination=mock/domain/driver_mock.go -package=domain_mock
+	@mockgen -source=infrastructure/clock.go -destination=mock/infrastructure/clock_mock.go -package=infrastructure_mock
+	@mockgen -source=infrastructure/file.go -destination=mock/infrastructure/file_mock.go -package=infrastructure_mock
+	@mockgen -source=applications/migrationscripts.go -destination=mock/applications/migrationscripts_mock.go -package=applications_mock

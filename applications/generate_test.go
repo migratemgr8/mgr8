@@ -7,6 +7,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/kenji-yamane/mgr8/domain"
+	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
+	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
 )
 
 var _ = Describe("Generate Command", func() {
@@ -16,16 +18,16 @@ var _ = Describe("Generate Command", func() {
 
 	Context("GetNextMigrationNumber", func() {
 		var (
-			driver                   *domain.MockDriver
-			deparser                 *domain.MockDeparser
-			migrationFileServiceMock *MockMigrationFileService
+			driver                   *domain_mock.MockDriver
+			deparser                 *domain_mock.MockDeparser
+			migrationFileServiceMock *applications_mock.MockMigrationFileService
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			driver = domain.NewMockDriver(ctrl)
-			migrationFileServiceMock = NewMockMigrationFileService(ctrl)
+			driver = domain_mock.NewMockDriver(ctrl)
+			migrationFileServiceMock = applications_mock.NewMockMigrationFileService(ctrl)
 			subject = NewGenerateCommand(driver, migrationFileServiceMock)
-			deparser = domain.NewMockDeparser(ctrl)
+			deparser = domain_mock.NewMockDeparser(ctrl)
 
 		})
 		When("Asked to execute", func() {

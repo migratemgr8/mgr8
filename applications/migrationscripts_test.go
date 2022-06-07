@@ -10,6 +10,9 @@ import (
 
 	"github.com/kenji-yamane/mgr8/domain"
 	"github.com/kenji-yamane/mgr8/infrastructure"
+	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
+	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
+	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Migration Scripts", func() {
@@ -30,7 +33,7 @@ var _ = Describe("Migration Scripts", func() {
 		}
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			clock := infrastructure.NewMockClock(ctrl)
+			clock := infrastructure_mock.NewMockClock(ctrl)
 			mockTime = time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)
 
 			clock.EXPECT().Now().Return(mockTime)
@@ -55,12 +58,12 @@ var _ = Describe("Migration Scripts", func() {
 	Context("WriteStatementsToFile", func() {
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			fileService := infrastructure.NewMockFileService(ctrl)
-			formatter := NewMockFileNameFormatter(ctrl)
+			fileService := infrastructure_mock.NewMockFileService(ctrl)
+			formatter := applications_mock.NewMockFileNameFormatter(ctrl)
 			formatter.EXPECT().FormatFilename(2, "type").Return("formatted_filename")
-			driver := domain.NewMockDriver(ctrl)
+			driver := domain_mock.NewMockDriver(ctrl)
 
-			mockDeparser := domain.NewMockDeparser(ctrl)
+			mockDeparser := domain_mock.NewMockDeparser(ctrl)
 			driver.EXPECT().Deparser().Return(mockDeparser)
 			mockDeparser.EXPECT().WriteScript([]string{"statement"}).Return("sql")
 			fileService.EXPECT().Write("directory", "formatted_filename", "sql")
@@ -75,12 +78,12 @@ var _ = Describe("Migration Scripts", func() {
 	})
 
 	Context("GetNextMigrationNumber", func() {
-		var fileService *infrastructure.MockFileService
+		var fileService *infrastructure_mock.MockFileService
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			clock := infrastructure.NewMockClock(ctrl)
-			fileService = infrastructure.NewMockFileService(ctrl)
-			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), domain.NewMockDriver(ctrl))
+			clock := infrastructure_mock.NewMockClock(ctrl)
+			fileService = infrastructure_mock.NewMockFileService(ctrl)
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), domain_mock.NewMockDriver(ctrl))
 		})
 		When("Has two migration files", func() {
 			It("Next migration number is 3", func() {
@@ -120,14 +123,14 @@ var _ = Describe("Migration Scripts", func() {
 
 	Context("GetSchemaFromFile", func() {
 		var (
-			fileService *infrastructure.MockFileService
-			driver      *domain.MockDriver
+			fileService *infrastructure_mock.MockFileService
+			driver      *domain_mock.MockDriver
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
-			clock := infrastructure.NewMockClock(ctrl)
-			fileService = infrastructure.NewMockFileService(ctrl)
-			driver = domain.NewMockDriver(ctrl)
+			clock := infrastructure_mock.NewMockClock(ctrl)
+			fileService = infrastructure_mock.NewMockFileService(ctrl)
+			driver = domain_mock.NewMockDriver(ctrl)
 			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver)
 		})
 		When("Reads file successfully", func() {
