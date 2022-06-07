@@ -60,3 +60,11 @@ func (d *deparser) MakeColumnNullable(tableName, columnName string, column *doma
 	columnDatatype := d.columnDatatype(columnName, newColumn)
 	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NULL", tableName, columnDatatype)
 }
+
+func (d *deparser) WriteScript(statements []string) string {
+	var scriptContent string
+	for _, s := range statements {
+		scriptContent += s + ";\n"
+	}
+	return scriptContent
+}

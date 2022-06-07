@@ -69,11 +69,11 @@ var _ = Describe("Schema Diff", func() {
 		})
 
 		When("Column switches to nullable", func() {
-			It("Returns MakeColumnNullable", func() {
+			It("Returns UnmakeColumnNotNull", func() {
 				oldSchema := &Schema{
 					Tables: map[string]*Table{
 						"table": NewTable("table", map[string]*Column{
-							"column": {IsNotNull: true},
+							"column": &Column{IsNotNull: true},
 						}),
 					},
 					Views: nil,
@@ -81,7 +81,7 @@ var _ = Describe("Schema Diff", func() {
 				newSchema := &Schema{
 					Tables: map[string]*Table{
 						"table": NewTable("table", map[string]*Column{
-							"column": {IsNotNull: false},
+							"column": &Column{IsNotNull: false},
 						}),
 					},
 					Views: nil,
@@ -91,31 +91,6 @@ var _ = Describe("Schema Diff", func() {
 				Expect(diffQueue).To(HaveLen(1))
 				Expect(diffQueue).To(ContainElements(
 					NewMakeColumnNullableDiff("table", "column"),
-				))
-			})
-		})
-
-		When("New column is added", func() {
-			It("Returns CreateColumn", func() {
-				column := &Column{Datatype: "integer"}
-
-				oldSchema := &Schema{
-					Tables: map[string]*Table{
-						"tableName": NewTable("tableName", map[string]*Column{}),
-					},
-				}
-				newSchema := &Schema{
-					Tables: map[string]*Table{
-						"tableName": NewTable("tableName", map[string]*Column{
-							"newColumn": column,
-						}),
-					},
-				}
-
-				diffQueue := newSchema.Diff(oldSchema)
-				Expect(diffQueue).To(HaveLen(1))
-				Expect(diffQueue).To(ContainElements(
-					NewCreateColumnDiff("tableName", "newColumn", column),
 				))
 			})
 		})

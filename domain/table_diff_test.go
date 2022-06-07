@@ -1,6 +1,5 @@
 package domain
 
-
 import (
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
@@ -9,13 +8,13 @@ import (
 
 var _ = Describe("Table Diff", func() {
 	var (
-		table *Table
+		table    *Table
 		deparser *MockDeparser
 
 		ctrl *gomock.Controller
 	)
 
-	BeforeEach(func(){
+	BeforeEach(func() {
 		ctrl = gomock.NewController(_t)
 		table = &Table{Name: "fake_table_name"}
 		deparser = NewMockDeparser(ctrl)
@@ -69,8 +68,7 @@ var _ = Describe("Table Diff", func() {
 		})
 	})
 
-	AfterEach(func(){
+	AfterEach(func() {
 		ctrl.Finish()
 	})
 })
-

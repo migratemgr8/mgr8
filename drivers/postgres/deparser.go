@@ -94,3 +94,11 @@ func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domai
 func (d *deparser) MakeColumnNullable(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
 }
+
+func (d *deparser) WriteScript(statements []string) string {
+	var scriptContent string
+	for _, s := range statements {
+		scriptContent += s + ";\n"
+	}
+	return scriptContent
+}
