@@ -9,6 +9,7 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
 	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
+	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Generate Command", func() {
@@ -26,7 +27,7 @@ var _ = Describe("Generate Command", func() {
 			ctrl := gomock.NewController(_t)
 			driver = domain_mock.NewMockDriver(ctrl)
 			migrationFileServiceMock = applications_mock.NewMockMigrationFileService(ctrl)
-			subject = NewGenerateCommand(driver, migrationFileServiceMock)
+			subject = NewGenerateCommand(driver, migrationFileServiceMock, infrastructure_mock.NewMockFileService(ctrl))
 			deparser = domain_mock.NewMockDeparser(ctrl)
 
 		})

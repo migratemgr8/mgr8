@@ -34,6 +34,20 @@ func (m *MockFileService) EXPECT() *MockFileServiceMockRecorder {
 	return m.recorder
 }
 
+// CreateFolderIfNotExists mocks base method.
+func (m *MockFileService) CreateFolderIfNotExists(arg0 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFolderIfNotExists", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateFolderIfNotExists indicates an expected call of CreateFolderIfNotExists.
+func (mr *MockFileServiceMockRecorder) CreateFolderIfNotExists(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFolderIfNotExists", reflect.TypeOf((*MockFileService)(nil).CreateFolderIfNotExists), arg0)
+}
+
 // List mocks base method.
 func (m *MockFileService) List(fileDirectory string) ([]infrastructure.MigrationFile, error) {
 	m.ctrl.T.Helper()

@@ -21,11 +21,16 @@ type generateCommand struct {
 	migrationFService MigrationFileService
 }
 
-func NewGenerateCommand(driver domain.Driver, migrationFService MigrationFileService) *generateCommand {
-	return &generateCommand{driver: driver, migrationFService: migrationFService}
+func NewGenerateCommand(driver domain.Driver, migrationFService MigrationFileService, fService infrastructure.FileService) *generateCommand {
+	return &generateCommand{driver: driver, migrationFService: migrationFService, fService: fService}
 }
 
 func (g *generateCommand) Execute(parameters *GenerateParameters) error {
+	newSchemaContent, err := g.fService.Read(parameters.NewSchemaPath)
+	if err != nil {
+		return err
+	}
+
 	oldSchema, err := g.migrationFService.GetSchemaFromFile(parameters.OldSchemaPath)
 	if err != nil {
 		return err
@@ -55,5 +60,5 @@ func (g *generateCommand) Execute(parameters *GenerateParameters) error {
 		return err
 	}
 
-	return nil
+	return g.fService.Write(".mgr8", "reference.sql", newSchemaContent)
 }
