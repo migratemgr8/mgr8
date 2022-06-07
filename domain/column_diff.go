@@ -42,8 +42,8 @@ type MakeColumnNotNullDiff struct {
 	column     *Column
 }
 
-func NewMakeColumnNotNullDiff(tableName string, columnName string) *MakeColumnNotNullDiff {
-	return &MakeColumnNotNullDiff{tableName: tableName, columnName: columnName}
+func NewMakeColumnNotNullDiff(tableName string, columnName string, column *Column) *MakeColumnNotNullDiff {
+	return &MakeColumnNotNullDiff{tableName: tableName, columnName: columnName, column: column}
 }
 
 func (m *MakeColumnNotNullDiff) Up(deparser Deparser) string {
@@ -60,8 +60,8 @@ type MakeColumnNullableDiff struct {
 	column     *Column
 }
 
-func NewMakeColumnNullableDiff(tableName string, columnName string) *MakeColumnNullableDiff {
-	return &MakeColumnNullableDiff{tableName: tableName, columnName: columnName}
+func NewMakeColumnNullableDiff(tableName string, columnName string, column *Column) *MakeColumnNullableDiff {
+	return &MakeColumnNullableDiff{tableName: tableName, columnName: columnName, column: column}
 }
 
 func (m *MakeColumnNullableDiff) Up(deparser Deparser) string {
