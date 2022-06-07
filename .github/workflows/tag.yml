@@ -4,23 +4,20 @@ on:
   push:
     branches:
       - master
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    name: Test
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
         with:
-          go-version: 1.16
-
+          go-version: '1.17.6'
       - name: Build
-        run: go build -v ./...
-
-      - name: Test
-        run: go test -v ./...
+        run: make build
+      - name: Run tests
+        run: make test
+      - name: Upload coverage reports to Codecov with GitHub Action
+        run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
 
   tag:
     runs-on: ubuntu-latest
