@@ -36,7 +36,7 @@ var _ = Describe("Schema Diff", func() {
 				Expect(diffQueue).To(HaveLen(4))
 				Expect(diffQueue).To(ContainElements(
 					domain.NewDropTableDiff(domain.NewTable("old_table", map[string]*domain.Column{})),
-					domain.NewDropColumnDiff("kept_table", "old_column"),
+					domain.NewDropColumnDiff("kept_table", "old_column", &domain.Column{}),
 					domain.NewCreateTableDiff(domain.NewTable("new_table", map[string]*domain.Column{})),
 					domain.NewCreateColumnDiff("kept_table", "new_column", &domain.Column{}),
 				))
@@ -65,7 +65,7 @@ var _ = Describe("Schema Diff", func() {
 				diffQueue := newSchema.Diff(oldSchema)
 				Expect(diffQueue).To(HaveLen(1))
 				Expect(diffQueue).To(ContainElements(
-					domain.NewMakeColumnNotNullDiff("table", "column"),
+					domain.NewMakeColumnNotNullDiff("table", "column", &domain.Column{IsNotNull: true}),
 				))
 			})
 		})
@@ -92,7 +92,7 @@ var _ = Describe("Schema Diff", func() {
 				diffQueue := newSchema.Diff(oldSchema)
 				Expect(diffQueue).To(HaveLen(1))
 				Expect(diffQueue).To(ContainElements(
-					domain.NewMakeColumnNullableDiff("table", "column"),
+					domain.NewMakeColumnNullableDiff("table", "column", &domain.Column{IsNotNull: false}),
 				))
 			})
 		})

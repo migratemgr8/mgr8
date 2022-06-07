@@ -56,7 +56,7 @@ var _ = Describe("Column Diff", func() {
 		)
 		When("Asked to go up", func() {
 			It("Calls Drop Column deparser", func() {
-				subject = domain.NewDropColumnDiff(tableName, columnName)
+				subject = domain.NewDropColumnDiff(tableName, columnName, column)
 
 				deparser.EXPECT().DropColumn(tableName, columnName).Return("FAKE DROP COLUMN")
 				result := subject.Up(deparser)
@@ -65,9 +65,9 @@ var _ = Describe("Column Diff", func() {
 		})
 		When("Asked to go down", func() {
 			It("Calls Drop Column deparser", func() {
-				subject = domain.NewDropColumnDiff(tableName, columnName)
+				subject = domain.NewDropColumnDiff(tableName, columnName, column)
 
-				deparser.EXPECT().AddColumn(tableName, columnName, nil).Return("FAKE CREATE COLUMN")
+				deparser.EXPECT().AddColumn(tableName, columnName, column).Return("FAKE CREATE COLUMN")
 				result := subject.Down(deparser)
 				Expect(result).To(Equal("FAKE CREATE COLUMN"))
 			})
@@ -80,18 +80,18 @@ var _ = Describe("Column Diff", func() {
 		)
 		When("Asked to go up", func() {
 			It("Calls Column Not Null deparser", func() {
-				subject = domain.NewMakeColumnNotNullDiff(tableName, columnName)
+				subject = domain.NewMakeColumnNotNullDiff(tableName, columnName, column)
 
-				deparser.EXPECT().MakeColumnNotNull(tableName, columnName, nil).Return("FAKE COLUMN NOT NULL")
+				deparser.EXPECT().MakeColumnNotNull(tableName, columnName, column).Return("FAKE COLUMN NOT NULL")
 				result := subject.Up(deparser)
 				Expect(result).To(Equal("FAKE COLUMN NOT NULL"))
 			})
 		})
 		When("Asked to go down", func() {
 			It("Calls Column Not Null deparser", func() {
-				subject = domain.NewMakeColumnNotNullDiff(tableName, columnName)
+				subject = domain.NewMakeColumnNotNullDiff(tableName, columnName, column)
 
-				deparser.EXPECT().MakeColumnNullable(tableName, columnName, nil).Return("FAKE COLUMN NULL")
+				deparser.EXPECT().MakeColumnNullable(tableName, columnName, column).Return("FAKE COLUMN NULL")
 				result := subject.Down(deparser)
 				Expect(result).To(Equal("FAKE COLUMN NULL"))
 			})
@@ -104,18 +104,18 @@ var _ = Describe("Column Diff", func() {
 		)
 		When("Asked to go up", func() {
 			It("Calls Column Nullable deparser", func() {
-				subject = domain.NewMakeColumnNullableDiff(tableName, columnName)
+				subject = domain.NewMakeColumnNullableDiff(tableName, columnName, column)
 
-				deparser.EXPECT().MakeColumnNullable(tableName, columnName, nil).Return("FAKE COLUMN NULL")
+				deparser.EXPECT().MakeColumnNullable(tableName, columnName, column).Return("FAKE COLUMN NULL")
 				result := subject.Up(deparser)
 				Expect(result).To(Equal("FAKE COLUMN NULL"))
 			})
 		})
 		When("Asked to go down", func() {
 			It("Calls Column Nullable deparser", func() {
-				subject = domain.NewMakeColumnNullableDiff(tableName, columnName)
+				subject = domain.NewMakeColumnNullableDiff(tableName, columnName, column)
 
-				deparser.EXPECT().MakeColumnNotNull(tableName, columnName, nil).Return("FAKE COLUMN NOT NULL")
+				deparser.EXPECT().MakeColumnNotNull(tableName, columnName, column).Return("FAKE COLUMN NOT NULL")
 				result := subject.Down(deparser)
 				Expect(result).To(Equal("FAKE COLUMN NOT NULL"))
 			})
