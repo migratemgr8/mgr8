@@ -24,8 +24,8 @@ type DropColumnDiff struct {
 	column     *Column
 }
 
-func NewDropColumnDiff(tableName string, columnName string) *DropColumnDiff {
-	return &DropColumnDiff{tableName: tableName, columnName: columnName}
+func NewDropColumnDiff(tableName string, columnName string, column *Column) *DropColumnDiff {
+	return &DropColumnDiff{tableName: tableName, columnName: columnName, column: column}
 }
 
 func (d *DropColumnDiff) Up(deparser Deparser) string {

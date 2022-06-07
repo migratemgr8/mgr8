@@ -56,7 +56,7 @@ var _ = Describe("Column Diff", func() {
 		)
 		When("Asked to go up", func() {
 			It("Calls Drop Column deparser", func() {
-				subject = domain.NewDropColumnDiff(tableName, columnName)
+				subject = domain.NewDropColumnDiff(tableName, columnName, column)
 
 				deparser.EXPECT().DropColumn(tableName, columnName).Return("FAKE DROP COLUMN")
 				result := subject.Up(deparser)
@@ -65,9 +65,9 @@ var _ = Describe("Column Diff", func() {
 		})
 		When("Asked to go down", func() {
 			It("Calls Drop Column deparser", func() {
-				subject = domain.NewDropColumnDiff(tableName, columnName)
+				subject = domain.NewDropColumnDiff(tableName, columnName, column)
 
-				deparser.EXPECT().AddColumn(tableName, columnName, nil).Return("FAKE CREATE COLUMN")
+				deparser.EXPECT().AddColumn(tableName, columnName, column).Return("FAKE CREATE COLUMN")
 				result := subject.Down(deparser)
 				Expect(result).To(Equal("FAKE CREATE COLUMN"))
 			})

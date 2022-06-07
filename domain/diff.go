@@ -38,9 +38,9 @@ func (t *Table) Diff(originalTable *Table) DiffDeque {
 		}
 	}
 
-	for columnName := range originalTable.Columns {
+	for columnName, column := range originalTable.Columns {
 		if _, ok := t.Columns[columnName]; !ok {
-			diffsQueue.Add(NewDropColumnDiff(t.Name, columnName))
+			diffsQueue.Add(NewDropColumnDiff(t.Name, columnName, column))
 		}
 	}
 
