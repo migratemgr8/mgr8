@@ -12,7 +12,7 @@ func NewEmptyCommand(migrationFService MigrationFileService) *emptyCommand {
 	return &emptyCommand{migrationFService: migrationFService}
 }
 
-func (g *emptyCommand) Execute(migrationDir  string) error {
+func (g *emptyCommand) Execute(migrationDir string) error {
 	nextMigration, err := g.migrationFService.GetNextMigrationNumber(migrationDir)
 	if err != nil {
 		return err

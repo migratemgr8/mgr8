@@ -8,17 +8,19 @@ import (
 	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
-type empty struct{ }
+type empty struct{
+	emptyCommand applications.EmptyCommand
+}
 
 func (c *empty) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
-	fileService := infrastructure.NewFileService()
-	clock := infrastructure.NewClock()
+	if c.emptyCommand == nil {
+		fileService := infrastructure.NewFileService()
+		clock := infrastructure.NewClock()
+		migrationFileService := applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver)
+		c.emptyCommand = applications.NewEmptyCommand(migrationFileService)
+	}
 
-	emptyCommand := applications.NewEmptyCommand(
-		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver),
-	)
-
-	err := emptyCommand.Execute(migrationsDir)
+	err := c.emptyCommand.Execute(migrationsDir)
 	if err != nil {
 		log.Print(err)
 	}

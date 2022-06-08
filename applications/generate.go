@@ -2,6 +2,7 @@ package applications
 
 import (
 	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/kenji-yamane/mgr8/global"
 	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
@@ -60,5 +61,5 @@ func (g *generateCommand) Execute(parameters *GenerateParameters) error {
 		return err
 	}
 
-	return g.fService.Write(".mgr8", "reference.sql", newSchemaContent)
+	return g.fService.Write(global.ApplicationFolder, global.ReferenceFile, newSchemaContent)
 }

@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"log"
+	"path"
 
 	"github.com/spf13/cobra"
 
 	"github.com/kenji-yamane/mgr8/applications"
+	"github.com/kenji-yamane/mgr8/global"
 	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
@@ -21,9 +23,10 @@ func (c *CheckCommand) Execute(cmd *cobra.Command, args []string) {
 	checkCommand := applications.NewCheckCommand(fileService)
 
 	initialFile := args[0]
-	err := checkCommand.Execute(initialFile)
+	referenceFile := path.Join(global.ApplicationFolder, global.ReferenceFile)
+
+	err := checkCommand.Execute(referenceFile, initialFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
-

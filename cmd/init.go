@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kenji-yamane/mgr8/applications"
+	"github.com/kenji-yamane/mgr8/global"
 	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
@@ -21,9 +22,8 @@ func (c *InitCommand) Execute(cmd *cobra.Command, args []string) {
 	initCommand := applications.NewInitCommand(fileService)
 
 	initialFile := args[0]
-	err := initCommand.Execute(initialFile)
+	err := initCommand.Execute(global.ApplicationFolder, global.ReferenceFile, initialFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
-

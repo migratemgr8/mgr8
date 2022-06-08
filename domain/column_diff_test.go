@@ -2,18 +2,18 @@ package domain_test
 
 import (
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/kenji-yamane/mgr8/domain"
 	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Column Diff", func() {
 	var (
-		tableName string
+		tableName  string
 		columnName string
-		column *domain.Column
-		deparser *domain_mock.MockDeparser
+		column     *domain.Column
+		deparser   *domain_mock.MockDeparser
 
 		ctrl *gomock.Controller
 	)
@@ -122,7 +122,7 @@ var _ = Describe("Column Diff", func() {
 		})
 	})
 
-	AfterEach(func(){
+	AfterEach(func() {
 		ctrl.Finish()
 	})
 })

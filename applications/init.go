@@ -5,7 +5,7 @@ import (
 )
 
 type InitCommand interface {
-	Execute(string) error
+	Execute(string, string, string) error
 }
 
 type initCommand struct {
@@ -16,16 +16,16 @@ func NewInitCommand(fileService infrastructure.FileService) *initCommand {
 	return &initCommand{fileService: fileService}
 }
 
-func (g *initCommand) Execute(initialFile string) error {
+func (g *initCommand) Execute(applicationFolder, referenceFile, initialFile string) error {
 	content, err := g.fileService.Read(initialFile)
 	if err != nil {
 		return err
 	}
 
-	err = g.fileService.CreateFolderIfNotExists(".mgr8")
+	err = g.fileService.CreateFolderIfNotExists(applicationFolder)
 	if err != nil {
 		return err
 	}
 
-	return g.fileService.Write(".mgr8", "reference.sql", content)
+	return g.fileService.Write(applicationFolder, referenceFile, content)
 }

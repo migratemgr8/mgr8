@@ -22,7 +22,7 @@ var _ = Describe("Generate Command", func() {
 			driver                   *domain_mock.MockDriver
 			deparser                 *domain_mock.MockDeparser
 			migrationFileServiceMock *applications_mock.MockMigrationFileService
-			fileService *infrastructure_mock.MockFileService
+			fileService              *infrastructure_mock.MockFileService
 		)
 		BeforeEach(func() {
 			ctrl := gomock.NewController(_t)
