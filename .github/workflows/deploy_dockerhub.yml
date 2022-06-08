@@ -1,0 +1,30 @@
+name: Deploy Docker Image
+
+on:
+  push:
+    branches: [deploy-to-dockerhub]
+
+jobs:
+  push-to-dockerhub:
+    runs-on: ubuntu-latest
+    name: Build and Push to DockerHub
+
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_TAG: '${{ secrets.DOCKER_USER }}/mgr8:latest'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker login
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - name: Build image
+        run: |
+          docker build . -tag $DOCKER_TAG
+
+      - name: Push to DockerHub
+        run: |
+          docker push $DOCKER_TAG
