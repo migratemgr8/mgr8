@@ -2,8 +2,8 @@ package domain_test
 
 import (
 	"github.com/golang/mock/gomock"
-	"github.com/kenji-yamane/mgr8/domain"
-	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
+	"github.com/migratemgr8/mgr8/domain"
+	domain_mock "github.com/migratemgr8/mgr8/mock/domain"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

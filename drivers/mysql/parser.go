@@ -14,7 +14,7 @@ import (
 	"github.com/pingcap/parser/ast"
 	_ "github.com/pingcap/tidb/types/parser_driver"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 type mySqlDriver struct {

@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
+	infrastructure_mock "github.com/migratemgr8/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Hashing", func() {

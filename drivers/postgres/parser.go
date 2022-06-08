@@ -11,7 +11,7 @@ import (
 
 	"fmt"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 type postgresDriver struct {

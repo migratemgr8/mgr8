@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	domain "github.com/kenji-yamane/mgr8/domain"
+	domain "github.com/migratemgr8/mgr8/domain"
 )
 
 // MockMigrationFileService is a mock of MigrationFileService interface.
