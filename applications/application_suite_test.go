@@ -1,4 +1,4 @@
-package domain_test
+package applications
 
 import (
 	"testing"
@@ -7,10 +7,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestDomain(t *testing.T) {
+func TestApplication(t *testing.T) {
 	_t = t
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Domain Test Suite")
+	RunSpecs(t, "Application Test Suite")
 }
 
 var _t *testing.T

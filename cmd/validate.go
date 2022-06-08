@@ -7,6 +7,7 @@ import (
 
 	"github.com/kenji-yamane/mgr8/applications"
 	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
 type validate struct{}
@@ -16,13 +17,13 @@ func (v *validate) execute(args []string, databaseURL string, migrationsDir stri
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		err := applications.CheckAndInstallTool(driver)
 
-		_, err = validateDirMigrations(dir, driver)
+		_, err = validateDirMigrations(dir, driver, applications.NewHashService(infrastructure.NewFileService()))
 
 		return err
 	})
 }
 
-func validateDirMigrations(dir string, driver domain.Driver) (int, error) {
+func validateDirMigrations(dir string, driver domain.Driver, hashService applications.HashService) (int, error) {
 	items, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return 0, err
@@ -37,7 +38,7 @@ func validateDirMigrations(dir string, driver domain.Driver) (int, error) {
 			return 0, err
 		}
 
-		valid, err := validateFileMigration(version, fullName, driver)
+		valid, err := validateFileMigration(version, fullName, driver, hashService)
 		if err != nil {
 			return 0, err
 		}
@@ -52,8 +53,8 @@ func validateDirMigrations(dir string, driver domain.Driver) (int, error) {
 	return 0, nil
 }
 
-func validateFileMigration(version int, filePath string, driver domain.Driver) (bool, error) {
-	hash_file, err := applications.GetSqlHash(filePath)
+func validateFileMigration(version int, filePath string, driver domain.Driver, hashService applications.HashService) (bool, error) {
+	hash_file, err := hashService.GetSqlHash(filePath)
 	if err != nil {
 		return false, err
 	}

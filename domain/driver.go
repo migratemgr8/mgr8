@@ -37,4 +37,6 @@ type Deparser interface {
 
 	MakeColumnNotNull(tableName, columnName string, column *Column) string
 	MakeColumnNullable(tableName, columnName string, column *Column) string
+
+	WriteScript(statements []string) string
 }

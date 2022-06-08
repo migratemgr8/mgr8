@@ -15,8 +15,11 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
-type apply struct{}
+type apply struct {
+	hashService applications.HashService
+}
 
+// TODO: replace file usage with infrastructure.FileService
 type MigrationFile struct {
 	fullPath string
 	name     string
@@ -224,7 +227,7 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 
 		currentDate := time.Now().Format("2006-01-02 15:04:05")
 
-		hash, err := applications.GetSqlHash(file.fullPath)
+		hash, err := a.hashService.GetSqlHash(file.fullPath)
 		if err != nil {
 			return 0, err
 		}
@@ -246,7 +249,7 @@ func (a *apply) runMigrations(migrations Migrations, version int, driver domain.
 					return 0, err
 				}
 			} else {
-				valid, err := validateFileMigration(migrationNum, file.fullPath, driver)
+				valid, err := validateFileMigration(migrationNum, file.fullPath, driver, a.hashService)
 				if err != nil {
 					return 0, err
 				}

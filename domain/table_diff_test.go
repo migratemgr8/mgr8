@@ -1,33 +1,35 @@
-package domain
-
+package domain_test
 
 import (
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/kenji-yamane/mgr8/domain"
+	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
 )
+
 
 var _ = Describe("Table Diff", func() {
 	var (
-		table *Table
-		deparser *MockDeparser
+		table    *domain.Table
+		deparser *domain_mock.MockDeparser
 
 		ctrl *gomock.Controller
 	)
 
-	BeforeEach(func(){
+	BeforeEach(func() {
 		ctrl = gomock.NewController(_t)
-		table = &Table{Name: "fake_table_name"}
-		deparser = NewMockDeparser(ctrl)
+		table = &domain.Table{Name: "fake_table_name"}
+		deparser = domain_mock.NewMockDeparser(ctrl)
 	})
 
 	Context("Create Table", func() {
 		var (
-			subject *CreateTableDiff
+			subject *domain.CreateTableDiff
 		)
 		When("Asked to go up", func() {
 			It("Calls Create Table deparser", func() {
-				subject = NewCreateTableDiff(table)
+				subject = domain.NewCreateTableDiff(table)
 
 				deparser.EXPECT().CreateTable(table).Return("FAKE CREATE TABLE")
 				result := subject.Up(deparser)
@@ -36,7 +38,7 @@ var _ = Describe("Table Diff", func() {
 		})
 		When("Asked to go down", func() {
 			It("Calls Drop Table deparser", func() {
-				subject = NewCreateTableDiff(table)
+				subject = domain.NewCreateTableDiff(table)
 
 				deparser.EXPECT().DropTable("fake_table_name").Return("FAKE DROP TABLE")
 				result := subject.Down(deparser)
@@ -47,11 +49,11 @@ var _ = Describe("Table Diff", func() {
 
 	Context("Drop Table", func() {
 		var (
-			subject *DropTableDiff
+			subject *domain.DropTableDiff
 		)
 		When("Asked to go up", func() {
 			It("Calls Drop Table deparser", func() {
-				subject = NewDropTableDiff(table)
+				subject = domain.NewDropTableDiff(table)
 
 				deparser.EXPECT().DropTable("fake_table_name").Return("FAKE DROP TABLE")
 				result := subject.Up(deparser)
@@ -60,7 +62,7 @@ var _ = Describe("Table Diff", func() {
 		})
 		When("Asked to go down", func() {
 			It("Calls Drop Table deparser", func() {
-				subject = NewDropTableDiff(table)
+				subject = domain.NewDropTableDiff(table)
 
 				deparser.EXPECT().CreateTable(table).Return("FAKE CREATE TABLE")
 				result := subject.Down(deparser)
@@ -69,8 +71,7 @@ var _ = Describe("Table Diff", func() {
 		})
 	})
 
-	AfterEach(func(){
+	AfterEach(func() {
 		ctrl.Finish()
 	})
 })
-

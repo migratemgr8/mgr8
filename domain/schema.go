@@ -6,7 +6,7 @@ type Schema struct {
 }
 
 type Table struct {
-	Name string
+	Name    string
 	Columns map[string]*Column
 }
 

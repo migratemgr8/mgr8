@@ -1,5 +1,7 @@
 # mgr8
 
+[![codecov](https://codecov.io/gh/kenji-yamane/mgr8/branch/master/graph/badge.svg?token=WUJ54P2TQQ)](https://codecov.io/gh/kenji-yamane/mgr8)
+
 An agnostic tool that abstracts migration operations
 
 ### Suported databases

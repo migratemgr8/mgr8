@@ -10,6 +10,9 @@ import (
 	"github.com/kenji-yamane/mgr8/domain"
 )
 
+var ErrInvalidMigrationType = errors.New("migration type should be either up/down")
+var ErrInvalidMigrationName = errors.New("migration file name in wrong format")
+
 func CheckAndInstallTool(driver domain.Driver) error {
 	isToolInstalled, err := driver.IsToolInstalled()
 	if err != nil {
@@ -40,9 +43,9 @@ func GetMigrationType(fileName string) (string, error) {
 	if len(match) > 1 {
 		migrationType := match[1]
 		if migrationType != "up" && migrationType != "down" {
-			return "", errors.New("migration type should be either up/down")
+			return "", ErrInvalidMigrationType
 		}
 		return migrationType, nil
 	}
-	return "", errors.New("migration file name in wrong format")
+	return "", ErrInvalidMigrationName
 }
