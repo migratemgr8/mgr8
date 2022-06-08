@@ -6,7 +6,7 @@ build: main.go
 	go build -o bin/mgr8 main.go
 
 build-docker-image:
-	docker build . -t mgr8
+	docker build . --file Dockerfile --tag migratemgr8/mgr8:latest
 
 install-tools:
 	go install github.com/golang/mock/mockgen@v1.6.0

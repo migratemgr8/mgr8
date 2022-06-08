@@ -51,11 +51,11 @@ Execute migrations by running
 
 ### Run with docker
 
-Build the docker image with `make build-docker-image`
+Pull latest image with `docker pull migratemgr8/mgr8:latest` or build it yourself with `make build-docker-image`.
 
 Run commands:
 ```bash
-docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} mgr8 <command>
+docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} migratemgr8/mgr8 <command>
 ```
 Make sure to replace the variables surrounded by double curly braces.
 ## Develop
@@ -96,7 +96,7 @@ Executing migrations with postgres driver
 # CLI version
 ./bin/mgr8 apply up --database=postgres://root:root@localhost:5432/core?sslmode=disable --dir=./migrations
 # Docker version
-docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username migratemgr8/mgr8 apply up
 ```
 
 Executing migrations with mysql driver
@@ -104,6 +104,6 @@ Executing migrations with mysql driver
 # CLI version
 ./bin/mgr8 apply up --database=root:root@tcp\(localhost:3306\)/core --dir=./migrations --driver=mysql
 # Docker version
-docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username mgr8 apply up --driver=mysql
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username migratemgr8/mgr8 apply up --driver=mysql
 ```
 
