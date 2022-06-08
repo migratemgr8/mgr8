@@ -1,4 +1,4 @@
-PACKAGE_NAME         := github.com/kenji-yamane/mgr8
+PACKAGE_NAME         := github.com/migratemgr8/mgr8
 GOLANG_CROSS_VERSION ?= v1.18.2
 
 .PHONY: build

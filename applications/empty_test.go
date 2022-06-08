@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
+	applications_mock "github.com/migratemgr8/mgr8/mock/applications"
 )
 
 var _ = Describe("Empty Command", func() {

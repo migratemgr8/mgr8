@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kenji-yamane/mgr8/applications"
-	"github.com/kenji-yamane/mgr8/global"
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/applications"
+	"github.com/migratemgr8/mgr8/global"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type CheckCommand struct {

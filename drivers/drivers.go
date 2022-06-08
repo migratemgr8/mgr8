@@ -3,9 +3,9 @@ package drivers
 import (
 	"fmt"
 
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/drivers/mysql"
-	"github.com/kenji-yamane/mgr8/drivers/postgres"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/drivers/mysql"
+	"github.com/migratemgr8/mgr8/drivers/postgres"
 )
 
 type DriverName string

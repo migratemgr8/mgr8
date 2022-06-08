@@ -3,9 +3,9 @@ package cmd
 import (
 	"log"
 
-	"github.com/kenji-yamane/mgr8/applications"
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/applications"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type diff struct{}

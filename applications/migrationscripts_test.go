@@ -8,11 +8,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/infrastructure"
-	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
-	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
-	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/infrastructure"
+	applications_mock "github.com/migratemgr8/mgr8/mock/applications"
+	domain_mock "github.com/migratemgr8/mgr8/mock/domain"
+	infrastructure_mock "github.com/migratemgr8/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Migration Scripts", func() {

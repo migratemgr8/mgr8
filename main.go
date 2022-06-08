@@ -1,6 +1,6 @@
 package main
 
-import "github.com/kenji-yamane/mgr8/cmd"
+import "github.com/migratemgr8/mgr8/cmd"
 
 func main() {
 	cmd.Execute()
