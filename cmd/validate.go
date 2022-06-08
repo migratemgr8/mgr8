@@ -38,7 +38,7 @@ func validateDirMigrations(dir string, driver domain.Driver, hashService applica
 			return 0, err
 		}
 
-		valid, err := validateFileMigration(version, fullName, driver, hashService)
+		valid, err := hashService.ValidateFileMigration(version, fullName, driver)
 		if err != nil {
 			return 0, err
 		}
@@ -51,18 +51,4 @@ func validateDirMigrations(dir string, driver domain.Driver, hashService applica
 	}
 
 	return 0, nil
-}
-
-func validateFileMigration(version int, filePath string, driver domain.Driver, hashService applications.HashService) (bool, error) {
-	hash_file, err := hashService.GetSqlHash(filePath)
-	if err != nil {
-		return false, err
-	}
-
-	hash_db, err := driver.GetVersionHashing(version)
-	if err != nil {
-		return false, err
-	}
-
-	return hash_file == hash_db, nil
 }
