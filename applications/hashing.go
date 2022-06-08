@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type HashService interface {

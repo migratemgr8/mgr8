@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
+	domain_mock "github.com/migratemgr8/mgr8/mock/domain"
 )
 
 var _ = Describe("Logs", func() {

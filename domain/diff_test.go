@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 var _ = Describe("Schema Diff", func() {

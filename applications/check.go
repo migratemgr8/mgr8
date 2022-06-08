@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type CheckCommand interface {

@@ -3,8 +3,8 @@ package cmd
 import (
 	"log"
 
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/drivers"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/drivers"
 	"github.com/spf13/cobra"
 )
 

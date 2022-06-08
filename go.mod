@@ -1,4 +1,4 @@
-module github.com/kenji-yamane/mgr8
+module github.com/migratemgr8/mgr8
 
 go 1.17
 

@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	infrastructure "github.com/kenji-yamane/mgr8/infrastructure"
+	infrastructure "github.com/migratemgr8/mgr8/infrastructure"
 )
 
 // MockFileService is a mock of FileService interface.

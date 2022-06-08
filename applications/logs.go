@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 var ErrInvalidMigrationType = errors.New("migration type should be either up/down")

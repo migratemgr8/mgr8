@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type MigrationFileService interface {
