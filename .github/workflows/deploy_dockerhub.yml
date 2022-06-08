@@ -12,27 +12,27 @@ jobs:
     outputs:
       hello: Hello
 
-    # env:
-    #   DOCKER_USER: ${{ secrets.DOCKER_USER }}
-    #   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    #   DOCKER_TAG: '${{ secrets.DOCKER_USER }}/mgr8:latest'
-    #   DOCKER_TAG_ONE: '${{ secrets.DOCKER_USER }}/mgr8:1.0.0'
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_TAG: '${{ secrets.DOCKER_USER }}/mgr8:latest'
+      DOCKER_TAG_ONE: '${{ secrets.DOCKER_USER }}/mgr8:1.0.0'
 
-    # steps:
-    #   - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-    #   - name: Docker login
-    #     run: |
-    #       docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: Docker login
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    #   - name: Build image
-    #     run: |
-    #       docker build . --file Dockerfile --tag $DOCKER_TAG --tag $DOCKER_TAG_ONE
+      # - name: Build image
+      #   run: |
+      #     docker build . --file Dockerfile --tag $DOCKER_TAG --tag $DOCKER_TAG_ONE
 
-    #   - name: Push to DockerHub
-    #     run: |
-    #       docker push $DOCKER_TAG &
-    #       docker push $DOCKER_TAG_ONE
+      # - name: Push to DockerHub
+      #   run: |
+      #     docker push $DOCKER_TAG &
+      #     docker push $DOCKER_TAG_ONE
 
   echo-second:
     runs-on: ubuntu-latest
