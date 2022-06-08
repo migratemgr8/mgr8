@@ -49,6 +49,16 @@ Execute migrations by running
 ```
 - number_of_migrations: Number of migrations to run (Optional). If not specified, runs only one.
 
+### Generate migrations
+
+Mgr8 keeps a copy of the latest schema at `.mgr8/reference.sql`. Copy the first schema version to this location, or simply run `./bin/mgr8 generate init <schemafile>` which will do the same.
+
+Then run `./bin/mgr8 generate diff <schemafile>` to generate migrations with respect to the reference file. This will also update the reference.
+
+When committing to a repository, check if the reference and the latest schema match. The command `./bin/mgr8 generate check <schemafile>` can be used, as it returns 0 if the files match.
+
+To generate an empty migration (e.g. for DML), use `./bin/mgr8 generate empty`.
+
 ## Develop
 
 ### Requirements

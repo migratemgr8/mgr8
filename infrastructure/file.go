@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,12 +18,23 @@ type FileService interface {
 	Write(migrationDir, filename, content string) error
 	Read(filename string) (string, error)
 	List(fileDirectory string) ([]MigrationFile, error)
+	CreateFolderIfNotExists(string) error
 }
 
 type fileService struct{}
 
 func NewFileService() *fileService {
 	return &fileService{}
+}
+
+func (f *fileService) CreateFolderIfNotExists(folderName string) error {
+	if _, err := os.Stat(folderName); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(folderName, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (f *fileService) Write(migrationDir, filename, content string) error {
