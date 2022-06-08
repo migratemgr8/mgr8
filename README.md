@@ -51,7 +51,7 @@ Execute migrations by running
 
 ### Generate migrations
 
-Mgr8 keeps a copy of the latest schema at `.mrg8/reference.sql`. Copy the first schema version to this location, or simply run `./bin/mgr8 generate init <schemafile>` which will do the same.
+Mgr8 keeps a copy of the latest schema at `.mgr8/reference.sql`. Copy the first schema version to this location, or simply run `./bin/mgr8 generate init <schemafile>` which will do the same.
 
 Then run `./bin/mgr8 generate diff <schemafile>` to generate migrations with respect to the reference file. This will also update the reference.
 
