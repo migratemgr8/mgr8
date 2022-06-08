@@ -23,7 +23,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . -tag $DOCKER_TAG
+          docker build . --file Dockerfile --tag $DOCKER_TAG
 
       - name: Push to DockerHub
         run: |
