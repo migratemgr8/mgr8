@@ -13,6 +13,7 @@ import (
 
 	"github.com/kenji-yamane/mgr8/applications"
 	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
 type apply struct {
@@ -36,6 +37,7 @@ type Migrations struct {
 }
 
 func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+	a.hashService = applications.NewHashService(infrastructure.NewFileService())
 	dir := migrationsDir
 	migrationFiles, err := getMigrationsFiles(dir)
 	if err != nil {
