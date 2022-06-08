@@ -1,5 +1,5 @@
 PACKAGE_NAME         := github.com/kenji-yamane/mgr8
-GOLANG_CROSS_VERSION ?= v1.17.6
+GOLANG_CROSS_VERSION ?= v1.18.2
 
 .PHONY: build
 build: main.go
