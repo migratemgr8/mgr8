@@ -8,13 +8,10 @@ import (
 	"github.com/kenji-yamane/mgr8/infrastructure"
 )
 
-type generate struct{}
+type diff struct{}
 
-func (g *generate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
 	newSchemaPath := args[0]
-
-	// TODO: get this from schemas folder
-	oldSchemaPath := args[1]
 
 	fileService := infrastructure.NewFileService()
 	clock := infrastructure.NewClock()
@@ -22,10 +19,11 @@ func (g *generate) execute(args []string, databaseURL string, migrationsDir stri
 	generateCommand := applications.NewGenerateCommand(
 		driver,
 		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver),
+		fileService,
 	)
 
 	err := generateCommand.Execute(&applications.GenerateParameters{
-		OldSchemaPath: oldSchemaPath,
+		OldSchemaPath: ".mgr8/reference.sql",
 		NewSchemaPath: newSchemaPath,
 		MigrationDir:  migrationsDir,
 	})

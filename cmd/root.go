@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const defaultMigrationDir = "migrations"
+
 func Execute() {
 	rootCmd := &cobra.Command{
 		Use:   "mgr8",
@@ -14,16 +16,48 @@ func Execute() {
 		Long:  `Long version: mgr8 is an agnostic tool that abstracts database migration operations`,
 	}
 
-	generateCommand := Command{cmd: &generate{}}
 	generateCmd := &cobra.Command{
 		Use:   "generate",
-		Short: "generate creates migration script based on the diff between schema versions",
-		Run:   generateCommand.Execute,
-		Args:  cobra.MinimumNArgs(2),
+		Short: "generate creates migration scripts",
 	}
-	generateCmd.Flags().StringVar(&generateCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
-	generateCmd.Flags().StringVar(&generateCommand.driverName, "driver", defaultDriverName, "Driver Name")
-	generateCmd.Flags().StringVar(&generateCommand.migrationsDir, "dir", "", "Migrations Directory")
+
+	diffCommand := Command{cmd: &diff{}}
+	diffCmd := &cobra.Command{
+		Use:   "diff",
+		Short: "diff creates migration script based on the diff between schema versions",
+		Run:   diffCommand.Execute,
+		Args:  cobra.MinimumNArgs(1),
+	}
+	diffCmd.Flags().StringVar(&diffCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
+	diffCmd.Flags().StringVar(&diffCommand.driverName, "driver", defaultDriverName, "Driver Name")
+	diffCmd.Flags().StringVar(&diffCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
+
+	emptyCommand := Command{cmd: &empty{}}
+	emptyCmd := &cobra.Command{
+		Use:   "empty",
+		Short: "empty creates empty migration",
+		Run:   emptyCommand.Execute,
+	}
+	emptyCmd.Flags().StringVar(&emptyCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
+	emptyCmd.Flags().StringVar(&emptyCommand.driverName, "driver", defaultDriverName, "Driver Name")
+
+	initCommand := &InitCommand{}
+	initCmd := &cobra.Command{
+		Use:   "init",
+		Short: "init sets the schema as reference",
+		Run:   initCommand.Execute,
+		Args:  cobra.MinimumNArgs(1),
+	}
+
+	checkCommand := &CheckCommand{}
+	checkCmd := &cobra.Command{
+		Use:   "check",
+		Short: "check returns 0 if files match",
+		Run:   checkCommand.Execute,
+		Args:  cobra.MinimumNArgs(1),
+	}
+
+	generateCmd.AddCommand(emptyCmd, diffCmd, initCmd, checkCmd)
 
 	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{

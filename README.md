@@ -49,6 +49,16 @@ Execute migrations by running
 ```
 - number_of_migrations: Number of migrations to run (Optional). If not specified, runs only one.
 
+### Generate migrations
+
+Mgr8 keeps a copy of the latest schema at `.mgr8/reference.sql`. Copy the first schema version to this location, or simply run `./bin/mgr8 generate init <schemafile>` which will do the same.
+
+Then run `./bin/mgr8 generate diff <schemafile>` to generate migrations with respect to the reference file. This will also update the reference.
+
+When committing to a repository, check if the reference and the latest schema match. The command `./bin/mgr8 generate check <schemafile>` can be used, as it returns 0 if the files match.
+
+To generate an empty migration (e.g. for DML), use `./bin/mgr8 generate empty`.
+
 ### Run with docker
 
 Build the docker image with `make build-docker-image`
@@ -58,6 +68,7 @@ Run commands:
 docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} mgr8 <command>
 ```
 Make sure to replace the variables surrounded by double curly braces.
+
 ## Develop
 
 ### Requirements
