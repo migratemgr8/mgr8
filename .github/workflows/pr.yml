@@ -1,4 +1,4 @@
-name: pr
+name: Pull Request Tests
 
 on:
   pull_request:
@@ -7,14 +7,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Test
+    name: Build & Test
+
     steps:
       - uses: actions/checkout@v2
         with:
           go-version: '1.17.6'
+
       - name: Build
         run: make build
+
       - name: Run tests
         run: make test
+
       - name: Upload coverage reports to Codecov with GitHub Action
-        run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
+        run: |
+          curl -Os https://uploader.codecov.io/latest/linux/codecov &&
+          chmod +x codecov &&
+          ./codecov -t ${CODECOV_TOKEN}
