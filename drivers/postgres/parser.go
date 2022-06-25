@@ -269,9 +269,16 @@ func (d *postgresDriver) parseColumn(columnDefinition *pg_query.ColumnDef) *doma
 		parameters["size"] = columnDefinition.TypeName.Typmods[0].GetAConst().Val.GetInteger().Ival
 	}
 
+	isNotNull := false
+	for _, constraint := range columnDefinition.Constraints {
+		if constraint.GetConstraint().GetContype().String() == "CONSTR_NOTNULL" {
+			isNotNull = true
+		}
+	}
+
 	return &domain.Column{
 		Datatype:   datatype,
 		Parameters: parameters,
-		IsNotNull:  columnDefinition.IsNotNull,
+		IsNotNull:  isNotNull,
 	}
 }
