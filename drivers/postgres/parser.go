@@ -271,7 +271,6 @@ func (d *postgresDriver) parseColumn(columnDefinition *pg_query.ColumnDef) *doma
 
 	isNotNull := false
 	for _, constraint := range columnDefinition.Constraints {
-		fmt.Printf("%s\n", constraint.GetConstraint().GetContype().String())
 		if constraint.GetConstraint().GetContype().String() == "CONSTR_NOTNULL" {
 			isNotNull = true
 		}
