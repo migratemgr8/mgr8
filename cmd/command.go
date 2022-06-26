@@ -5,10 +5,11 @@ import (
 
 	"github.com/migratemgr8/mgr8/domain"
 	"github.com/migratemgr8/mgr8/drivers"
+	"github.com/migratemgr8/mgr8/global"
 	"github.com/spf13/cobra"
 )
 
-var defaultDriverName = string(drivers.Postgres)
+var defaultDriverName = "postgres"
 
 type CommandExecutor interface {
 	execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error
@@ -22,7 +23,9 @@ type Command struct {
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
-	driver, err := drivers.GetDriver(c.driverName)
+	var d global.Database
+	d.FromStr(c.driverName)
+	driver, err := drivers.GetDriver(d)
 	if err != nil {
 		log.Fatal(err)
 	}
