@@ -1,5 +1,7 @@
 package domain
 
+import "reflect"
+
 type Diff interface {
 	Up(driver Deparser) string
 	Down(driver Deparser) string
@@ -50,6 +52,11 @@ func (t *Table) Diff(originalTable *Table) DiffDeque {
 func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) DiffDeque {
 	diffsQueue := NewDiffDeque()
 	column := table.Columns[columnName]
+
+	if !reflect.DeepEqual(column.Parameters, originalColumn.Parameters) {
+		diffsQueue.Add(NewChangeColumnParameterDiff(table.Name, columnName, originalColumn, column))
+	}
+
 	if column.IsNotNull != originalColumn.IsNotNull {
 		if column.IsNotNull {
 			diffsQueue.Add(NewMakeColumnNotNullDiff(table.Name, columnName, column))
@@ -57,5 +64,6 @@ func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) D
 			diffsQueue.Add(NewMakeColumnNullableDiff(table.Name, columnName, column))
 		}
 	}
+
 	return diffsQueue
 }
