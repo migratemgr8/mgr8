@@ -195,9 +195,9 @@ func GetConfigFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	configFilePath := filepath.Join(userHomeDir, ConfigurationFilename)
+	path := filepath.Join(userHomeDir, ConfigurationFilename)
 
-	return configFilePath, err
+	return path, err
 }
 
 func IsYesAnswer(answer byte) bool {
