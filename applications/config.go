@@ -23,6 +23,11 @@ type Configuration struct {
 	Hostname string
 }
 
+type UserDetails struct {
+	username string
+	hostname string
+}
+
 const (
 	ConfigurationFilename string = ".mgr8config"
 	RunWithDockerEnv      string = "RUN_WITH_DOCKER"
@@ -49,17 +54,43 @@ func CreateConfiguration() (Configuration, error) {
 		return configuration, err
 	}
 
-	fmt.Println("Configuration file not found. Configure:")
+	fmt.Println("Configuration file not found. Configure the tool:")
 
-	// configuring user details (username and hostname)
-	configuration.Hostname, err = os.Hostname()
+	// configure user details
+	userDetails, err := GetUserDetails()
 	if err != nil {
 		return configuration, err
 	}
 
-	configuration.Username = configuration.Hostname
+	configuration.Username = userDetails.username
+	configuration.Hostname = userDetails.hostname
 
-	fmt.Println("Your default username is " + configuration.Username + ". It will be displayed on the logs when you execute a migration.")
+	if err = InsertUserDetails(userDetails.username, userDetails.hostname, configurationFile); err != nil {
+		return configuration, err
+	}
+
+	if err = configurationFile.Close(); err != nil {
+		return configuration, err
+	}
+
+	fmt.Println("MGR8 Configured successfuly!")
+
+	return configuration, err
+}
+
+func GetUserDetails() (UserDetails, error) {
+	userDetails := UserDetails{}
+
+	// configuring user details (username and hostname)
+	hostname, err := os.Hostname()
+	if err != nil {
+		return userDetails, err
+	}
+
+	userDetails.hostname = hostname
+	userDetails.username = userDetails.hostname
+
+	fmt.Println("Your default username is " + userDetails.username + ". It will be displayed on the logs when you execute a migration.")
 	var answer byte
 
 	for !IsValidAnswer(answer) {
@@ -80,26 +111,16 @@ func CreateConfiguration() (Configuration, error) {
 			fmt.Println("Please enter your username:")
 			scanner.Scan()
 			if err := scanner.Err(); err != nil {
-				return configuration, err
+				return userDetails, err
 			}
 			username = scanner.Text()
 			isValidUsername, err = IsValidUsername(username)
 		}
 
-		configuration.Username = username
+		userDetails.username = username
 	}
 
-	if err = InsertUserDetails(configuration.Username, configuration.Hostname, configurationFile); err != nil {
-		return configuration, err
-	}
-
-	if err = configurationFile.Close(); err != nil {
-		return configuration, err
-	}
-
-	fmt.Println("MGR8 Configured successfuly!")
-
-	return configuration, err
+	return userDetails, err
 }
 
 func (c *ConfigurationService) GetConfigurations() (Configuration, error) {
