@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -124,12 +125,23 @@ func (c *ConfigurationService) GetConfigurations() (Configuration, error) {
 
 	configurationFile, err := os.Open(configFilePath)
 
-	// if configuration file doesnt exist
+	// if configuration file doesn't exist
 	if errors.Is(err, os.ErrNotExist) {
 		configuration, err = CreateConfiguration()
 		return configuration, err
 	}
 
+	configuration, err = ParseConfiguration(configurationFile)
+
+	if err := configurationFile.Close(); err != nil {
+		return configuration, err
+	}
+
+	return configuration, err
+}
+
+func ParseConfiguration(configurationFile io.Reader) (Configuration, error) {
+	configuration := Configuration{}
 	scanner := bufio.NewScanner(configurationFile)
 
 	var section string
@@ -154,11 +166,17 @@ func (c *ConfigurationService) GetConfigurations() (Configuration, error) {
 		}
 	}
 
-	if err = configurationFile.Close(); err != nil {
-		return configuration, err
-	}
+	return configuration, nil
+}
 
-	return configuration, err
+func GetConfigFilePath() (string, error) {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	path := filepath.Join(userHomeDir, ConfigurationFilename)
+
+	return path, err
 }
 
 func GetSection(line string) string {
@@ -188,16 +206,6 @@ func GetSectionProperty(line string) SectionProperty {
 	}
 
 	return property
-}
-
-func GetConfigFilePath() (string, error) {
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	path := filepath.Join(userHomeDir, ConfigurationFilename)
-
-	return path, err
 }
 
 func IsYesAnswer(answer byte) bool {
