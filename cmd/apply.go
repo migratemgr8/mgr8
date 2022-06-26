@@ -210,11 +210,13 @@ func getMigrationsToRun(migrationFiles []MigrationFile, currentVersion int, numM
 }
 
 func (a *apply) runMigrations(migrations Migrations, version int, driver domain.Driver) (int, error) {
-	username_service := applications.NewUserNameService()
-	username, err := username_service.GetUserName()
+	configurationService := applications.NewConfigurationService()
+	configuration, err := configurationService.GetConfigurations()
 	if err != nil {
 		return 0, err
 	}
+
+	username := configuration.Username
 
 	migrationType := "up"
 	if !migrations.isUpType {
