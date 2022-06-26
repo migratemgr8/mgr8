@@ -23,12 +23,12 @@ type Configuration struct {
 }
 
 const (
-	ConfigFileName   string = ".mgr8config"
-	RunWithDockerEnv string = "RUN_WITH_DOCKER"
-	UsernameEnv      string = "MGR8_USERNAME"
-	UserSection      string = "user"
-	UsernameKey      string = "username"
-	HostnameKey      string = "hostname"
+	ConfigurationFilename string = ".mgr8config"
+	RunWithDockerEnv      string = "RUN_WITH_DOCKER"
+	UsernameEnv           string = "MGR8_USERNAME"
+	userSection           string = "user"
+	usernameKey           string = "username"
+	hostnameKey           string = "hostname"
 )
 
 func NewConfigurationService() *ConfigurationService {
@@ -145,10 +145,10 @@ func (c *ConfigurationService) GetConfigurations() (Configuration, error) {
 
 		property := GetSectionProperty(scanner.Text())
 
-		if section == UserSection {
-			if property.key == UsernameKey {
+		if section == userSection {
+			if property.key == usernameKey {
 				configuration.Username = property.value
-			} else if property.key == HostnameKey {
+			} else if property.key == hostnameKey {
 				configuration.Hostname = property.value
 			}
 		}
@@ -195,7 +195,7 @@ func GetConfigFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	configFilePath := filepath.Join(userHomeDir, ConfigFileName)
+	configFilePath := filepath.Join(userHomeDir, ConfigurationFilename)
 
 	return configFilePath, err
 }
@@ -220,6 +220,6 @@ func IsValidUsername(username string) (bool, error) {
 }
 
 func InsertUserDetails(username string, hostname string, config *os.File) error {
-	_, err := config.WriteString("[" + UserSection + "]\n\t" + UsernameKey + " = " + username + "\n\t" + HostnameKey + " = " + hostname + "\n")
+	_, err := config.WriteString("[" + userSection + "]\n\t" + usernameKey + " = " + username + "\n\t" + hostnameKey + " = " + hostname + "\n")
 	return err
 }
