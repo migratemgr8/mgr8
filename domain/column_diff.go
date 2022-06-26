@@ -71,3 +71,22 @@ func (m *MakeColumnNullableDiff) Up(deparser Deparser) string {
 func (m *MakeColumnNullableDiff) Down(deparser Deparser) string {
 	return deparser.MakeColumnNotNull(m.tableName, m.columnName, m.column)
 }
+
+type ChangeColumnDataTypeParameterDiff struct {
+	tableName      string
+	columnName     string
+	originalColumn *Column
+	column         *Column
+}
+
+func NewChangeColumnParameterDiff(tableName string, columnName string, originalColumn *Column, column *Column) *ChangeColumnDataTypeParameterDiff {
+	return &ChangeColumnDataTypeParameterDiff{tableName: tableName, columnName: columnName, originalColumn: originalColumn, column: column}
+}
+
+func (m *ChangeColumnDataTypeParameterDiff) Up(deparser Deparser) string {
+	return deparser.ChangeDataTypeParameters(m.tableName, m.columnName, m.column)
+}
+
+func (m *ChangeColumnDataTypeParameterDiff) Down(deparser Deparser) string {
+	return deparser.ChangeDataTypeParameters(m.tableName, m.columnName, m.originalColumn)
+}
