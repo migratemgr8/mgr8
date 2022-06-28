@@ -24,7 +24,7 @@ const (
 
 type zapFactory struct { }
 
-func NewZapFactory() *zapFactory {
+func newZapFactory() *zapFactory {
 	return &zapFactory{}
 }
 
@@ -75,7 +75,7 @@ type logService struct {
 }
 
 func NewLogService(logLevel LogLevel) (*logService, error){
-	zapFact := NewZapFactory()
+	zapFact := newZapFactory()
 	logger, err := zapFact.Build(logLevel)
 	if err != nil {
 		return nil, err
