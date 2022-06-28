@@ -17,9 +17,6 @@ type CommandExecutor interface {
 }
 
 type Command struct {
-	verbose bool
-	silent bool
-
 	driverName    string
 	databaseURL   string
 	migrationsDir string
@@ -28,12 +25,21 @@ type Command struct {
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		panic(err)
+	}
+	silent, err := 	cmd.Flags().GetBool("silent")
+	if err != nil {
+		panic(err)
+	}
+
 	driver, err := drivers.GetDriver(c.driverName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	logLevel, err := c.getLogLevel()
+	logLevel, err := c.getLogLevel(verbose, silent)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,12 +50,12 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	}
 }
 
-func (c *Command) getLogLevel() (applications.LogLevel, error) {
-	if c.silent && c.verbose {
+func (c *Command) getLogLevel(verbose, silent bool) (applications.LogLevel, error) {
+	if silent && verbose {
 		return "", errors.New("flags silent and verbose are mutually exclusive")
-	} else if c.silent {
+	} else if silent {
 		return applications.CriticalLogLevel, nil
-	} else if c.verbose {
+	} else if verbose {
 		return applications.DebugLogLevel, nil
 	}
 	return applications.InfoLogLevel, nil

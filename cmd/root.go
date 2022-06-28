@@ -16,6 +16,9 @@ func Execute() {
 		Long:  `Long version: mgr8 is an agnostic tool that abstracts database migration operations`,
 	}
 
+	rootCmd.PersistentFlags().Bool("verbose", false, "Verbose")
+	rootCmd.PersistentFlags().Bool("silent", false, "Silent")
+
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "generate creates migration scripts",
@@ -28,8 +31,6 @@ func Execute() {
 		Run:   diffCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
-	diffCmd.Flags().BoolVar(&diffCommand.verbose, "verbose", false,"Verbose")
-	diffCmd.Flags().BoolVar(&diffCommand.silent, "silent",  false, "Silent")
 	diffCmd.Flags().StringVar(&diffCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	diffCmd.Flags().StringVar(&diffCommand.driverName, "driver", defaultDriverName, "Driver Name")
 	diffCmd.Flags().StringVar(&diffCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
@@ -54,7 +55,7 @@ func Execute() {
 
 	checkCommand := &CheckCommand{}
 	checkCmd := &cobra.Command{
-		Use:   "check",
+		Use:   "check file",
 		Short: "check returns 0 if files match",
 		Run:   checkCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
@@ -64,7 +65,7 @@ func Execute() {
 
 	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{
-		Use:   "apply",
+		Use:   "apply n",
 		Short: "apply runs migrations in the selected database",
 		Run:   applyCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
@@ -75,7 +76,7 @@ func Execute() {
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
-		Use:   "validate",
+		Use:   "validate file",
 		Short: "validate compares migrations sql scripts against hashing ",
 		Run:   validateCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
