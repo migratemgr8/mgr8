@@ -46,3 +46,4 @@ mock:
 	@mockgen -source=infrastructure/clock.go -destination=mock/infrastructure/clock_mock.go -package=infrastructure_mock
 	@mockgen -source=infrastructure/file.go -destination=mock/infrastructure/file_mock.go -package=infrastructure_mock
 	@mockgen -source=applications/migrationscripts.go -destination=mock/applications/migrationscripts_mock.go -package=applications_mock
+	@mockgen -source=applications/log.go -destination=mock/applications/log_mock.go -package=applications_mock

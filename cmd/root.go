@@ -28,6 +28,8 @@ func Execute() {
 		Run:   diffCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
 	}
+	diffCmd.Flags().BoolVar(&diffCommand.verbose, "verbose", false,"Verbose")
+	diffCmd.Flags().BoolVar(&diffCommand.silent, "silent",  false, "Silent")
 	diffCmd.Flags().StringVar(&diffCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	diffCmd.Flags().StringVar(&diffCommand.driverName, "driver", defaultDriverName, "Driver Name")
 	diffCmd.Flags().StringVar(&diffCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
@@ -37,13 +39,14 @@ func Execute() {
 		Use:   "empty",
 		Short: "empty creates empty migration",
 		Run:   emptyCommand.Execute,
+		Args: cobra.NoArgs,
 	}
 	emptyCmd.Flags().StringVar(&emptyCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
 	emptyCmd.Flags().StringVar(&emptyCommand.driverName, "driver", defaultDriverName, "Driver Name")
 
 	initCommand := &InitCommand{}
 	initCmd := &cobra.Command{
-		Use:   "init",
+		Use:   "init file",
 		Short: "init sets the schema as reference",
 		Run:   initCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),

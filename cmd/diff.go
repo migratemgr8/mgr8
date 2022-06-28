@@ -8,21 +8,25 @@ import (
 	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
-type diff struct{}
+type diff struct { }
 
-func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error {
 	newSchemaPath := args[0]
 
 	fileService := infrastructure.NewFileService()
 	clock := infrastructure.NewClock()
+	logService, err := applications.NewLogService(verbosity)
+	if err != nil {
+		log.Print(err)
+	}
 
 	generateCommand := applications.NewGenerateCommand(
 		driver,
-		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver),
+		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver, logService),
 		fileService,
 	)
 
-	err := generateCommand.Execute(&applications.GenerateParameters{
+	err = generateCommand.Execute(&applications.GenerateParameters{
 		OldSchemaPath: ".mgr8/reference.sql",
 		NewSchemaPath: newSchemaPath,
 		MigrationDir:  migrationsDir,

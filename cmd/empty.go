@@ -12,11 +12,16 @@ type empty struct {
 	emptyCommand applications.EmptyCommand
 }
 
-func (c *empty) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+func (c *empty) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error {
 	if c.emptyCommand == nil {
 		fileService := infrastructure.NewFileService()
 		clock := infrastructure.NewClock()
-		migrationFileService := applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver)
+		logService, err := applications.NewLogService(applications.InfoLogLevel)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		migrationFileService := applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver, logService)
 		c.emptyCommand = applications.NewEmptyCommand(migrationFileService)
 	}
 

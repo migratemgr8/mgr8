@@ -2,8 +2,6 @@ package applications
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/migratemgr8/mgr8/domain"
 	"github.com/migratemgr8/mgr8/infrastructure"
 )
@@ -18,13 +16,15 @@ type migrationFileService struct {
 	fileService       infrastructure.FileService
 	driver            domain.Driver
 	fileNameFormatter FileNameFormatter
+	logService        LogService
 }
 
-func NewMigrationFileService(fService infrastructure.FileService, fileNameFormatter FileNameFormatter, driver domain.Driver) *migrationFileService {
+func NewMigrationFileService(fService infrastructure.FileService, fileNameFormatter FileNameFormatter, driver domain.Driver, logService LogService) *migrationFileService {
 	return &migrationFileService{
 		fileService:       fService,
 		driver:            driver,
 		fileNameFormatter: fileNameFormatter,
+		logService:        logService,
 	}
 }
 
@@ -54,7 +54,7 @@ func (g *migrationFileService) GetSchemaFromFile(filename string) (*domain.Schem
 
 func (g *migrationFileService) WriteStatementsToFile(migrationDir string, statements []string, migrationNumber int, migrationType string) error {
 	filename := g.fileNameFormatter.FormatFilename(migrationNumber, migrationType)
-	log.Printf("Generating file %s migration %s", migrationType, filename)
+	g.logService.Info("Generating file %s migration %s", migrationType, filename)
 	content := g.driver.Deparser().WriteScript(statements)
 	return g.fileService.Write(migrationDir, filename, content)
 }
