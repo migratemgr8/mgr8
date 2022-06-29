@@ -103,7 +103,7 @@ func (d *deparser) SetColumnDefault(tableName, columnName string, defaultValue i
 	}
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %v", tableName, columnName, defaultValue)
 }
-
+ 
 func (d *deparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
 	_, hasSize := column.Parameters["size"]
 
