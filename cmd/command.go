@@ -22,7 +22,7 @@ type Command struct {
 	databaseURL   string
 	migrationsDir string
 
-	cmd           CommandExecutor
+	cmd CommandExecutor
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
@@ -30,7 +30,7 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	silent, err := 	cmd.Flags().GetBool("silent")
+	silent, err := cmd.Flags().GetBool("silent")
 	if err != nil {
 		panic(err)
 	}
