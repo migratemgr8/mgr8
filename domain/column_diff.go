@@ -90,3 +90,22 @@ func (m *ChangeColumnDataTypeParameterDiff) Up(deparser Deparser) string {
 func (m *ChangeColumnDataTypeParameterDiff) Down(deparser Deparser) string {
 	return deparser.ChangeDataTypeParameters(m.tableName, m.columnName, m.originalColumn)
 }
+
+type SetDefaultValueDiff struct {
+	tableName      string
+	columnName     string
+	newDefaultValue interface{}
+	originalDefaultValue         interface{}
+}
+
+func NewSetDefaultValueDiff(tableName string, columnName string, newDefaultValue, originalDefaultValue interface{}) *SetDefaultValueDiff {
+	return &SetDefaultValueDiff{tableName: tableName, columnName: columnName, newDefaultValue: newDefaultValue, originalDefaultValue: originalDefaultValue}
+}
+
+func (m *SetDefaultValueDiff) Up(deparser Deparser) string {
+	return deparser.SetColumnDefault(m.tableName, m.columnName, m.newDefaultValue)
+}
+
+func (m *SetDefaultValueDiff) Down(deparser Deparser) string {
+	return deparser.SetColumnDefault(m.tableName, m.columnName, m.originalDefaultValue)
+}
