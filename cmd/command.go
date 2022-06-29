@@ -4,16 +4,17 @@ import (
 	"errors"
 	"log"
 
-	"github.com/migratemgr8/mgr8/applications"
 	"github.com/migratemgr8/mgr8/domain"
 	"github.com/migratemgr8/mgr8/drivers"
+	"github.com/migratemgr8/mgr8/infrastructure"
+
 	"github.com/spf13/cobra"
 )
 
 var defaultDriverName = string(drivers.Postgres)
 
 type CommandExecutor interface {
-	execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error
+	execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error
 }
 
 type Command struct {
@@ -50,13 +51,13 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 	}
 }
 
-func (c *Command) getLogLevel(verbose, silent bool) (applications.LogLevel, error) {
+func (c *Command) getLogLevel(verbose, silent bool) (infrastructure.LogLevel, error) {
 	if silent && verbose {
 		return "", errors.New("flags silent and verbose are mutually exclusive")
 	} else if silent {
-		return applications.CriticalLogLevel, nil
+		return infrastructure.CriticalLogLevel, nil
 	} else if verbose {
-		return applications.DebugLogLevel, nil
+		return infrastructure.DebugLogLevel, nil
 	}
-	return applications.InfoLogLevel, nil
+	return infrastructure.InfoLogLevel, nil
 }

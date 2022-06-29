@@ -12,7 +12,7 @@ import (
 
 type validate struct{}
 
-func (v *validate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error {
+func (v *validate) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	dir := args[0]
 	return driver.ExecuteTransaction(databaseURL, func() error {
 		err := applications.CheckAndInstallTool(driver)

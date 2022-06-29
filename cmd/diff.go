@@ -10,12 +10,12 @@ import (
 
 type diff struct { }
 
-func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error {
+func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	newSchemaPath := args[0]
 
 	fileService := infrastructure.NewFileService()
 	clock := infrastructure.NewClock()
-	logService, err := applications.NewLogService(verbosity)
+	logService, err := infrastructure.NewLogService(verbosity)
 	if err != nil {
 		log.Print(err)
 	}

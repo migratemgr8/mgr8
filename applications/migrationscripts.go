@@ -16,10 +16,10 @@ type migrationFileService struct {
 	fileService       infrastructure.FileService
 	driver            domain.Driver
 	fileNameFormatter FileNameFormatter
-	logService        LogService
+	logService        infrastructure.LogService
 }
 
-func NewMigrationFileService(fService infrastructure.FileService, fileNameFormatter FileNameFormatter, driver domain.Driver, logService LogService) *migrationFileService {
+func NewMigrationFileService(fService infrastructure.FileService, fileNameFormatter FileNameFormatter, driver domain.Driver, logService infrastructure.LogService) *migrationFileService {
 	return &migrationFileService{
 		fileService:       fService,
 		driver:            driver,

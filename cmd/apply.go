@@ -36,7 +36,7 @@ type Migrations struct {
 	isUpType bool
 }
 
-func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity applications.LogLevel) error {
+func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	a.hashService = applications.NewHashService(infrastructure.NewFileService())
 	dir := migrationsDir
 	migrationFiles, err := getMigrationsFiles(dir)

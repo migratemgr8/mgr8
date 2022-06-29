@@ -1,11 +1,11 @@
-package applications
+package infrastructure
 
 import (
-	"log"
-	"time"
+"log"
+"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+"go.uber.org/zap"
+"go.uber.org/zap/zapcore"
 )
 
 type LogService interface {
@@ -69,7 +69,6 @@ func (z *zapFactory) Build(level LogLevel) (*zap.SugaredLogger, error) {
 	return logger.Sugar(), nil
 }
 
-
 type logService struct {
 	logger   *zap.SugaredLogger
 }
@@ -94,3 +93,4 @@ func (l *logService) Debug(args ...interface{}) {
 func (l *logService) Critical(args ...interface{}) {
 	l.logger.Error(args)
 }
+
