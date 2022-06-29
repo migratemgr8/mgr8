@@ -413,6 +413,20 @@ func (mr *MockDeparserMockRecorder) MakeColumnNullable(tableName, columnName, co
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeColumnNullable", reflect.TypeOf((*MockDeparser)(nil).MakeColumnNullable), tableName, columnName, column)
 }
 
+// SetColumnDefault mocks base method.
+func (m *MockDeparser) SetColumnDefault(tableName, columnName string, defaultValue interface{}) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetColumnDefault", tableName, columnName, defaultValue)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// SetColumnDefault indicates an expected call of SetColumnDefault.
+func (mr *MockDeparserMockRecorder) SetColumnDefault(tableName, columnName, defaultValue interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetColumnDefault", reflect.TypeOf((*MockDeparser)(nil).SetColumnDefault), tableName, columnName, defaultValue)
+}
+
 // WriteScript mocks base method.
 func (m *MockDeparser) WriteScript(statements []string) string {
 	m.ctrl.T.Helper()

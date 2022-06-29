@@ -8,7 +8,7 @@ import (
 	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
-type diff struct { }
+type diff struct{}
 
 func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	newSchemaPath := args[0]

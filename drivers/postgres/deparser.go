@@ -96,6 +96,14 @@ func (d *deparser) MakeColumnNullable(tableName, columnName string, column *doma
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
 }
 
+func (d *deparser) SetColumnDefault(tableName, columnName string, defaultValue interface{}) string {
+	switch defaultValue.(type){
+	case string:
+		return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET DEFAULT '%v'", tableName, columnName, defaultValue)
+	}
+	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %v", tableName, columnName, defaultValue)
+}
+ 
 func (d *deparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
 	_, hasSize := column.Parameters["size"]
 

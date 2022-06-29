@@ -19,16 +19,15 @@ var _ = Describe("Postgres Driver", func() {
 		BeforeEach(func() {
 			subject = NewPostgresDriver()
 		})
-
 		When("Table has all data types", func() {
 			It("Parses each of them", func() {
 				migration := `
 				CREATE TABLE users (
 					social_number VARCHAR(9) PRIMARY KEY,
 					phone VARCHAR(11),
-					name VARCHAR(15) NOT NULL,
+					name VARCHAR(15) NOT NULL DEFAULT 'oi',
 					age INTEGER,
-					size INT,
+					size INT DEFAULT 5,
 					height DECIMAL(2, 3),
 					ddi VARCHAR(3)
 				);
@@ -45,10 +44,10 @@ var _ = Describe("Postgres Driver", func() {
 							Columns: map[string]*domain.Column{
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},
-								"name":          {Datatype: "varchar", IsNotNull: true, Parameters: map[string]interface{}{"size": int32(15)}},
+								"name":          {Datatype: "varchar", IsNotNull: true, Parameters: map[string]interface{}{"size": int32(15)}, DefaultValue: "oi"},
 								"ddi":           {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
 								"age":           {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
-								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
+								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}, DefaultValue: int32(5)},
 								"height":        {Datatype: "numeric", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(2), "scale": int32(3)}},
 							},
 						},
@@ -155,6 +154,23 @@ var _ = Describe("Postgres Driver", func() {
 				Expect(strings.ToLower(stmt)).To(Equal("drop table if exists tbl"))
 			})
 		})
+
+		When("A column changes its default value", func() {
+			It("Updates string default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := subject.SetColumnDefault(tableName, columnName, "default_value")
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set default 'default_value'"))
+			})
+
+			It("Updates int default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := subject.SetColumnDefault(tableName, columnName, 25)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set default 25"))
+			})
+		})
+
 
 		When("Table has 1 as maximum argument in data type", func() {
 			It("Generate CREATE TABLE statement", func() {

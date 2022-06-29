@@ -65,5 +65,9 @@ func (c *Column) Diff(table *Table, columnName string, originalColumn *Column) D
 		}
 	}
 
+	if column.DefaultValue != originalColumn.DefaultValue {
+		diffsQueue.Add(NewSetDefaultValueDiff(table.Name, columnName, column.DefaultValue, originalColumn.DefaultValue))
+	}
+
 	return diffsQueue
 }

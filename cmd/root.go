@@ -40,7 +40,7 @@ func Execute() {
 		Use:   "empty",
 		Short: "empty creates empty migration",
 		Run:   emptyCommand.Execute,
-		Args: cobra.NoArgs,
+		Args:  cobra.NoArgs,
 	}
 	emptyCmd.Flags().StringVar(&emptyCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
 	emptyCmd.Flags().StringVar(&emptyCommand.driverName, "driver", defaultDriverName, "Driver Name")
