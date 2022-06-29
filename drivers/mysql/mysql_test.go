@@ -124,6 +124,22 @@ var _ = Describe("MySql Driver", func() {
 			})
 		})
 
+		When("A column changes its default value", func() {
+			It("Updates string default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := dp.SetColumnDefault(tableName, columnName, "default_value")
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter col set default 'default_value'"))
+			})
+
+			It("Updates int default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := dp.SetColumnDefault(tableName, columnName, 25)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter col set default 25"))
+			})
+		})
+
 		When("New schema doesn't have a table", func() {
 			It("Drops the table", func() {
 				tableName := "tbl"

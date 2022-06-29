@@ -96,5 +96,32 @@ var _ = Describe("Schema Diff", func() {
 				))
 			})
 		})
+
+		When("Column changes default", func() {
+			It("Returns SetColumnDefault", func() {
+				oldSchema := &domain.Schema{
+					Tables: map[string]*domain.Table{
+						"table": domain.NewTable("table", map[string]*domain.Column{
+							"column": &domain.Column{DefaultValue: int32(10)},
+						}),
+					},
+					Views: nil,
+				}
+				newSchema := &domain.Schema{
+					Tables: map[string]*domain.Table{
+						"table": domain.NewTable("table", map[string]*domain.Column{
+							"column": &domain.Column{DefaultValue: int32(20)},
+						}),
+					},
+					Views: nil,
+				}
+
+				diffQueue := newSchema.Diff(oldSchema)
+				Expect(diffQueue).To(HaveLen(1))
+				Expect(diffQueue).To(ContainElements(
+					domain.NewSetDefaultValueDiff("table", "column", int32(20), int32(10)),
+				))
+			})
+		})
 	})
 })

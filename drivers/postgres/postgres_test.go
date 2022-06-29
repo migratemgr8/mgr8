@@ -155,6 +155,23 @@ var _ = Describe("Postgres Driver", func() {
 			})
 		})
 
+		When("A column changes its default value", func() {
+			It("Updates string default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := subject.SetColumnDefault(tableName, columnName, "default_value")
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set default 'default_value'"))
+			})
+
+			It("Updates int default", func() {
+				columnName := "col"
+				tableName := "tbl"
+				stmt := subject.SetColumnDefault(tableName, columnName, 25)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col set default 25"))
+			})
+		})
+
+
 		When("Table has 1 as maximum argument in data type", func() {
 			It("Generate CREATE TABLE statement", func() {
 				table := &domain.Table{

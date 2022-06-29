@@ -122,6 +122,30 @@ var _ = Describe("Column Diff", func() {
 		})
 	})
 
+	Context("Column Default", func() {
+		var (
+			subject *domain.SetDefaultValueDiff
+		)
+		When("Asked to go up", func() {
+			It("Calls Set Column Default deparser", func() {
+				subject = domain.NewSetDefaultValueDiff(tableName, columnName, "new_default", "old_default")
+
+				deparser.EXPECT().SetColumnDefault(tableName, columnName, "new_default").Return("FAKE COLUMN NEW DEFAULT")
+				result := subject.Up(deparser)
+				Expect(result).To(Equal("FAKE COLUMN NEW DEFAULT"))
+			})
+		})
+		When("Asked to go down", func() {
+			It("Calls Set Column Default deparser", func() {
+				subject = domain.NewSetDefaultValueDiff(tableName, columnName, "new_default", "old_default")
+
+				deparser.EXPECT().SetColumnDefault(tableName, columnName, "old_default").Return("FAKE COLUMN OLD DEFAULT")
+				result := subject.Down(deparser)
+				Expect(result).To(Equal("FAKE COLUMN OLD DEFAULT"))
+			})
+		})
+	})
+
 	AfterEach(func() {
 		ctrl.Finish()
 	})
