@@ -43,6 +43,7 @@ release:
 .PHONY: mock
 mock:
 	@mockgen -source=domain/driver.go -destination=mock/domain/driver_mock.go -package=domain_mock
+	@mockgen -source=domain/diff_deque.go -destination=mock/domain/diff_deque_mock.go -package=domain_mock
 	@mockgen -source=infrastructure/clock.go -destination=mock/infrastructure/clock_mock.go -package=infrastructure_mock
 	@mockgen -source=infrastructure/file.go -destination=mock/infrastructure/file_mock.go -package=infrastructure_mock
 	@mockgen -source=applications/migrationscripts.go -destination=mock/applications/migrationscripts_mock.go -package=applications_mock
