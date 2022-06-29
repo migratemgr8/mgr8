@@ -26,9 +26,10 @@ var _ = Describe("Postgres Driver", func() {
 				CREATE TABLE users (
 					social_number VARCHAR(9) PRIMARY KEY,
 					phone VARCHAR(11),
-					name VARCHAR(15),
+					name VARCHAR(15) NOT NULL,
 					age INTEGER,
 					size INT,
+					height DECIMAL(2, 3),
 					ddi VARCHAR(3)
 				);
 
@@ -44,10 +45,11 @@ var _ = Describe("Postgres Driver", func() {
 							Columns: map[string]*domain.Column{
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},
-								"name":          {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(15)}},
+								"name":          {Datatype: "varchar", IsNotNull: true, Parameters: map[string]interface{}{"size": int32(15)}},
 								"ddi":           {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
 								"age":           {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
 								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
+								"height":        {Datatype: "numeric", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(2), "scale": int32(3)}},
 							},
 						},
 					},
@@ -125,6 +127,24 @@ var _ = Describe("Postgres Driver", func() {
 				column := &domain.Column{Datatype: "int", IsNotNull: false}
 				stmt := subject.MakeColumnNullable(tableName, columnName, column)
 				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col drop not null"))
+			})
+		})
+
+		When("A column's datatype parameters change", func() {
+			It("Changes single parameter datatype", func() {
+				columnName := "col"
+				tableName := "tbl"
+				column := &domain.Column{Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(10)}}
+				stmt := subject.ChangeDataTypeParameters(tableName, columnName, column)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col type varchar(10)"))
+			})
+
+			It("Changes double parameter datatype", func() {
+				columnName := "col"
+				tableName := "tbl"
+				column := &domain.Column{Datatype: "decimal", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(2), "scale": int32(3)}}
+				stmt := subject.ChangeDataTypeParameters(tableName, columnName, column)
+				Expect(strings.ToLower(stmt)).To(Equal("alter table tbl alter column col type decimal(2, 3)"))
 			})
 		})
 

@@ -61,6 +61,16 @@ func (d *deparser) MakeColumnNullable(tableName, columnName string, column *doma
 	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NULL", tableName, columnDatatype)
 }
 
+func (d *deparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
+	_, hasSize := column.Parameters["size"]
+
+	if hasSize {
+		return fmt.Sprintf("ALTER TABLE %s MODIFY %s %s(%s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["size"]))
+	} else {
+		return fmt.Sprintf("ALTER TABLE %s MODIFY %s %s(%s, %s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["precision"]), fmt.Sprint(column.Parameters["scale"]))
+	}
+}
+
 func (d *deparser) WriteScript(statements []string) string {
 	var scriptContent string
 	for _, s := range statements {
