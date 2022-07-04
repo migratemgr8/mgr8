@@ -7,7 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultMigrationDir = "migrations"
+const (
+	defaultMigrationDir = "migrations"
+	verboseFlag         = "verbose"
+	silentFlag          = "silent"
+)
 
 func Execute() {
 	rootCmd := &cobra.Command{
@@ -15,6 +19,9 @@ func Execute() {
 		Short: "mgr8 is a framework-agnostic database migrations tool",
 		Long:  `Long version: mgr8 is an agnostic tool that abstracts database migration operations`,
 	}
+
+	rootCmd.PersistentFlags().Bool(verboseFlag, false, "Verbose")
+	rootCmd.PersistentFlags().Bool(silentFlag, false, "Silent")
 
 	generateCmd := &cobra.Command{
 		Use:   "generate",
@@ -37,13 +44,14 @@ func Execute() {
 		Use:   "empty",
 		Short: "empty creates empty migration",
 		Run:   emptyCommand.Execute,
+		Args:  cobra.NoArgs,
 	}
 	emptyCmd.Flags().StringVar(&emptyCommand.migrationsDir, "dir", defaultMigrationDir, "Migrations Directory")
 	emptyCmd.Flags().StringVar(&emptyCommand.driverName, "driver", defaultDriverName, "Driver Name")
 
 	initCommand := &InitCommand{}
 	initCmd := &cobra.Command{
-		Use:   "init",
+		Use:   "init file",
 		Short: "init sets the schema as reference",
 		Run:   initCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
@@ -51,7 +59,7 @@ func Execute() {
 
 	checkCommand := &CheckCommand{}
 	checkCmd := &cobra.Command{
-		Use:   "check",
+		Use:   "check file",
 		Short: "check returns 0 if files match",
 		Run:   checkCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
@@ -61,7 +69,7 @@ func Execute() {
 
 	applyCommand := Command{cmd: &apply{}}
 	applyCmd := &cobra.Command{
-		Use:   "apply",
+		Use:   "apply n",
 		Short: "apply runs migrations in the selected database",
 		Run:   applyCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),
@@ -72,7 +80,7 @@ func Execute() {
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
-		Use:   "validate",
+		Use:   "validate file",
 		Short: "validate compares migrations sql scripts against hashing ",
 		Run:   validateCommand.Execute,
 		Args:  cobra.MinimumNArgs(1),

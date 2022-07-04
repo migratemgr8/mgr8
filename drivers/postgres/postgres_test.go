@@ -19,16 +19,15 @@ var _ = Describe("Postgres Driver", func() {
 		BeforeEach(func() {
 			subject = NewPostgresDriver()
 		})
-
 		When("Table has all data types", func() {
 			It("Parses each of them", func() {
 				migration := `
 				CREATE TABLE users (
 					social_number VARCHAR(9) PRIMARY KEY,
 					phone VARCHAR(11),
-					name VARCHAR(15) NOT NULL,
+					name VARCHAR(15) NOT NULL DEFAULT 'oi',
 					age INTEGER,
-					size INT,
+					size INT DEFAULT 5,
 					height DECIMAL(2, 3),
 					ddi VARCHAR(3)
 				);
@@ -45,10 +44,10 @@ var _ = Describe("Postgres Driver", func() {
 							Columns: map[string]*domain.Column{
 								"social_number": {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(9)}},
 								"phone":         {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(11)}},
-								"name":          {Datatype: "varchar", IsNotNull: true, Parameters: map[string]interface{}{"size": int32(15)}},
+								"name":          {Datatype: "varchar", IsNotNull: true, Parameters: map[string]interface{}{"size": int32(15)}, DefaultValue: "oi"},
 								"ddi":           {Datatype: "varchar", IsNotNull: false, Parameters: map[string]interface{}{"size": int32(3)}},
 								"age":           {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
-								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}},
+								"size":          {Datatype: "int4", IsNotNull: false, Parameters: map[string]interface{}{}, DefaultValue: int32(5)},
 								"height":        {Datatype: "numeric", IsNotNull: false, Parameters: map[string]interface{}{"precision": int32(2), "scale": int32(3)}},
 							},
 						},
