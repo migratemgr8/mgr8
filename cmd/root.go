@@ -7,7 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultMigrationDir = "migrations"
+const (
+	defaultMigrationDir = "migrations"
+	verboseFlag         = "verbose"
+	silentFlag          = "silent"
+)
 
 func Execute() {
 	rootCmd := &cobra.Command{
@@ -16,8 +20,8 @@ func Execute() {
 		Long:  `Long version: mgr8 is an agnostic tool that abstracts database migration operations`,
 	}
 
-	rootCmd.PersistentFlags().Bool("verbose", false, "Verbose")
-	rootCmd.PersistentFlags().Bool("silent", false, "Silent")
+	rootCmd.PersistentFlags().Bool(verboseFlag, false, "Verbose")
+	rootCmd.PersistentFlags().Bool(silentFlag, false, "Silent")
 
 	generateCmd := &cobra.Command{
 		Use:   "generate",

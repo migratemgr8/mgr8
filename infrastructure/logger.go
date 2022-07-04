@@ -1,11 +1,11 @@
 package infrastructure
 
 import (
-"log"
-"time"
+	"log"
+	"time"
 
-"go.uber.org/zap"
-"go.uber.org/zap/zapcore"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type LogService interface {

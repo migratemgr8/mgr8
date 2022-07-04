@@ -26,11 +26,11 @@ type Command struct {
 }
 
 func (c *Command) Execute(cmd *cobra.Command, args []string) {
-	verbose, err := cmd.Flags().GetBool("verbose")
+	verbose, err := cmd.Flags().GetBool(verboseFlag)
 	if err != nil {
 		panic(err)
 	}
-	silent, err := cmd.Flags().GetBool("silent")
+	silent, err := cmd.Flags().GetBool(silentFlag)
 	if err != nil {
 		panic(err)
 	}
@@ -54,10 +54,15 @@ func (c *Command) Execute(cmd *cobra.Command, args []string) {
 func (c *Command) getLogLevel(verbose, silent bool) (infrastructure.LogLevel, error) {
 	if silent && verbose {
 		return "", errors.New("flags silent and verbose are mutually exclusive")
-	} else if silent {
+	}
+
+	if silent {
 		return infrastructure.CriticalLogLevel, nil
-	} else if verbose {
+	}
+
+	if verbose {
 		return infrastructure.DebugLogLevel, nil
 	}
+
 	return infrastructure.InfoLogLevel, nil
 }

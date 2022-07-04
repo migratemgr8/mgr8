@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/migratemgr8/mgr8/applications"
@@ -17,7 +18,7 @@ func (g *diff) execute(args []string, databaseURL string, migrationsDir string, 
 	clock := infrastructure.NewClock()
 	logService, err := infrastructure.NewLogService(verbosity)
 	if err != nil {
-		log.Print(err)
+		return fmt.Errorf("could not start logger, error: %w", err)
 	}
 
 	generateCommand := applications.NewGenerateCommand(
