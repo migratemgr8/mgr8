@@ -275,15 +275,27 @@ func (d *postgresDriver) parseColumn(columnDefinition *pg_query.ColumnDef) *doma
 	}
 
 	isNotNull := false
+	defaultValue := interface{}(nil)
+
 	for _, constraint := range columnDefinition.Constraints {
-		if constraint.GetConstraint().GetContype().String() == "CONSTR_NOTNULL" {
+		if constraint.GetConstraint().GetContype() == pg_query.ConstrType_CONSTR_NOTNULL {
 			isNotNull = true
+		}
+		if constraint.GetConstraint().GetContype() == pg_query.ConstrType_CONSTR_DEFAULT {
+			constant := constraint.GetConstraint().RawExpr.GetAConst().Val
+			switch constant.Node.(type) {
+			case *pg_query.Node_String_:
+				defaultValue = constant.GetString_().Str
+			case *pg_query.Node_Integer:
+				defaultValue = constant.GetInteger().Ival
+			}
 		}
 	}
 
 	return &domain.Column{
-		Datatype:   datatype,
-		Parameters: parameters,
-		IsNotNull:  isNotNull,
+		Datatype:     datatype,
+		Parameters:   parameters,
+		IsNotNull:    isNotNull,
+		DefaultValue: defaultValue,
 	}
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/migratemgr8/mgr8/applications"
@@ -10,19 +11,23 @@ import (
 
 type diff struct{}
 
-func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+func (g *diff) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	newSchemaPath := args[0]
 
 	fileService := infrastructure.NewFileService()
 	clock := infrastructure.NewClock()
+	logService, err := infrastructure.NewLogService(verbosity)
+	if err != nil {
+		return fmt.Errorf("could not start logger, error: %w", err)
+	}
 
 	generateCommand := applications.NewGenerateCommand(
 		driver,
-		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver),
+		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver, logService),
 		fileService,
 	)
 
-	err := generateCommand.Execute(&applications.GenerateParameters{
+	err = generateCommand.Execute(&applications.GenerateParameters{
 		OldSchemaPath: ".mgr8/reference.sql",
 		NewSchemaPath: newSchemaPath,
 		MigrationDir:  migrationsDir,
