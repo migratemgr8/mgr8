@@ -5,8 +5,8 @@ import "sync"
 type Database int
 
 const (
-	Postgres Database = 0
-	MySql    Database = 1
+	Postgres Database = iota
+	MySql    Database = iota
 )
 
 var toStr = map[Database]string{
