@@ -11,7 +11,7 @@ import (
 
 var _t *testing.T
 
-func TestApplication(t *testing.T) {
+func TestTesting(t *testing.T) {
 	_t = t
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Testing Test Suite")
@@ -19,7 +19,7 @@ func TestApplication(t *testing.T) {
 
 var _ = Describe("Check Command", func() {
 	var (
-		subject *dockerManager
+		subject *DockerManager
 	)
 
 	BeforeSuite(func() {
