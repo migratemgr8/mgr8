@@ -134,7 +134,7 @@ var _ = Describe("Migration Scripts", func() {
 			clock := infrastructure_mock.NewMockClock(ctrl)
 			fileService = infrastructure_mock.NewMockFileService(ctrl)
 			driver = domain_mock.NewMockDriver(ctrl)
-			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver, applications_mock.NewMockLogService(ctrl))
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver, anyLog(ctrl))
 		})
 		When("Reads file successfully", func() {
 			It("Generates expected filename", func() {
@@ -158,7 +158,7 @@ var _ = Describe("Migration Scripts", func() {
 
 })
 
-func anyLog(ctrl *gomock.Controller) *applications_mock.MockLogService{
+func anyLog(ctrl *gomock.Controller) *applications_mock.MockLogService {
 	mockLogService := applications_mock.NewMockLogService(ctrl)
 	mockLogService.EXPECT().Info(gomock.Any()).AnyTimes()
 	mockLogService.EXPECT().Critical(gomock.Any()).AnyTimes()
