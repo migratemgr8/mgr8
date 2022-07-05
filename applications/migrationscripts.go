@@ -2,6 +2,7 @@ package applications
 
 import (
 	"fmt"
+
 	"github.com/migratemgr8/mgr8/domain"
 	"github.com/migratemgr8/mgr8/infrastructure"
 )
@@ -46,6 +47,7 @@ func (m *migrationFileService) GetNextMigrationNumber(dir string) (int, error) {
 func (g *migrationFileService) GetSchemaFromFile(filename string) (*domain.Schema, error) {
 	content, err := g.fileService.Read(filename)
 	if err != nil {
+		g.logService.Critical("Could not read from", filename)
 		return nil, err
 	}
 
@@ -54,7 +56,7 @@ func (g *migrationFileService) GetSchemaFromFile(filename string) (*domain.Schem
 
 func (g *migrationFileService) WriteStatementsToFile(migrationDir string, statements []string, migrationNumber int, migrationType string) error {
 	filename := g.fileNameFormatter.FormatFilename(migrationNumber, migrationType)
-	g.logService.Info("Generating file %s migration %s", migrationType, filename)
+	g.logService.Info("Generating file for", migrationType, "migration:", filename)
 	content := g.driver.Deparser().WriteScript(statements)
 	return g.fileService.Write(migrationDir, filename, content)
 }
