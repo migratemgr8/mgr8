@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/migratemgr8/mgr8/applications"
 	"github.com/migratemgr8/mgr8/infrastructure"
 	"github.com/migratemgr8/mgr8/testing/fixtures"
+	"os"
 	"testing"
 
 	"github.com/migratemgr8/mgr8/domain"
@@ -37,6 +39,7 @@ func TestCommand(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
+	createConfigFileIfNotExists()
 	dm = mgr8testing.NewDockerManager()
 
 	postgresTestDriver = mgr8testing.NewTestDriver(global.Postgres)
@@ -64,6 +67,23 @@ var _ = AfterSuite(func() {
 	Expect(err).To(BeNil())
 	postgresMigrations.TearDown()
 })
+
+func createConfigFileIfNotExists() {
+	configPath, err := applications.GetConfigFilePath()
+	Expect(err).To(BeNil())
+	config, err := os.Open(configPath)
+	if err == nil {
+		return
+	}
+	Expect(err).To(Equal(os.ErrNotExist))
+	username := "mock-user"
+	hostname, err := os.Hostname()
+	Expect(err).To(BeNil())
+	err = applications.InsertUserDetails(username, hostname, config)
+	Expect(err).To(BeNil())
+	err = config.Close()
+	Expect(err).To(BeNil())
+}
 
 func getDriverSuccessfully(d global.Database) domain.Driver {
 	driver, err := drivers.GetDriver(d)
