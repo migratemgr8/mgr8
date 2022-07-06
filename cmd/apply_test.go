@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/migratemgr8/mgr8/domain"
 	"github.com/migratemgr8/mgr8/global"
 	"github.com/migratemgr8/mgr8/infrastructure"
 	. "github.com/onsi/ginkgo"
@@ -18,7 +17,7 @@ var _ = Describe("Apply integration test", func() {
 			It("executes all files in folder", func() {
 				subject = &apply{}
 				err := subject.execute(
-					[]string{"up"},
+					[]string{"up", "3"},
 					dm.GetConnectionString(global.Postgres),
 					testMigrationsFolder,
 					postgresDriver,
@@ -26,11 +25,14 @@ var _ = Describe("Apply integration test", func() {
 				)
 				Expect(err).To(BeNil())
 
-				var exists bool
-				err = postgresDb.QueryRow(`
-				SELECT EXISTS (
-				    SELECT FROM information_schema.tables WHERE  table_name   = $1
-	   			)`, domain.LogsTableName).Scan(&exists)
+				finalUser := *userFixture0001
+				finalUser.VarcharColumns = append(finalUser.VarcharColumns, firstNewColumnFixture0002)
+				finalUser.VarcharColumns = append(finalUser.VarcharColumns, secondNewColumnFixture0003)
+
+				exists, err := postgresTestDriver.AssertFixtureExistence(&finalUser)
+				Expect(err).To(BeNil())
+				Expect(exists).To(BeTrue())
+				exists, err = postgresTestDriver.AssertViewFixtureExistence(userViewFixture0002)
 				Expect(err).To(BeNil())
 				Expect(exists).To(BeTrue())
 			})

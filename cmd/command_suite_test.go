@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/migratemgr8/mgr8/infrastructure"
 	"github.com/migratemgr8/mgr8/testing/fixtures"
 	"testing"
@@ -17,9 +16,8 @@ import (
 
 var _t *testing.T
 var dm *mgr8testing.DockerManager
-var postgresDb *sqlx.DB
-var mySqlDb *sqlx.DB
 
+var postgresTestDriver mgr8testing.TestDriver
 var postgresDriver domain.Driver
 var testMigrationsFolder = "apply-test-migrations"
 var postgresMigrations fixtures.MigrationsFixture
@@ -36,12 +34,8 @@ func TestCommand(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	dm = mgr8testing.NewDockerManager()
-	var err error
-	postgresDb, err = sqlx.Connect(global.Postgres.String(), dm.GetConnectionString(global.Postgres))
-	Expect(err).To(BeNil())
-	mySqlDb, err = sqlx.Connect(global.MySql.String(), dm.GetConnectionString(global.MySql))
-	Expect(err).To(BeNil())
 
+	postgresTestDriver = mgr8testing.NewTestDriver(global.Postgres)
 	postgresDriver = getDriverSuccessfully(global.Postgres)
 	postgresMigrations = fixtures.NewMigrationsFixture(testMigrationsFolder,
 		infrastructure.NewFileService(),
@@ -53,12 +47,9 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = AfterSuite(func() {
-	err := postgresDb.Close()
+	err := dm.CloseAll()
 	Expect(err).To(BeNil())
-	err = mySqlDb.Close()
-	Expect(err).To(BeNil())
-	err = dm.CloseAll()
-	Expect(err).To(BeNil())
+	postgresMigrations.TearDown()
 })
 
 func getDriverSuccessfully(d global.Database) domain.Driver {

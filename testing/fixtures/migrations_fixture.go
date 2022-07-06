@@ -32,7 +32,7 @@ func NewMigrationsFixture(folderPath string, fileService infrastructure.FileServ
 	return &migrationsFixture{
 		folderPath:  folderPath,
 		fileService: fileService,
-		usersTable:  &Fixture{tableName: "users"},
+		usersTable:  &Fixture{TableName: "users"},
 		deparser:    deparser,
 	}
 }
@@ -43,7 +43,7 @@ func (f *migrationsFixture) AddRawFile(filename, content string) {
 }
 
 func (f *migrationsFixture) AddMigration0001() *Fixture {
-	f.usersTable.varcharColumns = []VarcharFixture{
+	f.usersTable.VarcharColumns = []VarcharFixture{
 		{"social_number", 9},
 		{"name", 15},
 		{"phone", 11},
@@ -53,45 +53,46 @@ func (f *migrationsFixture) AddMigration0001() *Fixture {
 	}
 	f.AddRawFile(f.migrationUpMockName(1), f.deparser.WriteScript(upStatements))
 	downStatements := []string{
-		f.deparser.DropTable(f.usersTable.tableName),
+		f.deparser.DropTable(f.usersTable.TableName),
 	}
 	f.AddRawFile(f.migrationDownMockName(1), f.deparser.WriteScript(downStatements))
 	return f.usersTable
 }
 
 func (f *migrationsFixture) AddMigration0002() (VarcharFixture, *ViewFixture) {
-	f.usersView = &ViewFixture{viewName: "user_phones", columns: []string{"name", "full_phone"}}
-	newVarcharFixture := VarcharFixture{name: "ddi", cap: 3}
-	f.usersTable.varcharColumns = append(f.usersTable.varcharColumns, newVarcharFixture)
+	f.usersView = &ViewFixture{
+		ViewName:       "user_phones",
+		VarcharColumns: []VarcharFixture{f.usersTable.VarcharColumns[2]},
+		TextColumns:    []string{"full_phone"},
+	}
+	newVarcharFixture := VarcharFixture{Name: "ddi", Cap: 3}
+	f.usersTable.VarcharColumns = append(f.usersTable.VarcharColumns, newVarcharFixture)
+	f.usersView.Statement = fmt.Sprintf(`SELECT %s, CONCAT(%s, %s) AS %s FROM %s`,
+		f.usersView.VarcharColumns[0].Name,
+		f.usersTable.VarcharColumns[2].Name, f.usersTable.VarcharColumns[3].Name,
+		f.usersView.TextColumns[0], f.usersTable.TableName)
 	upStatements := []string{
-		f.deparser.AddColumn(f.usersTable.tableName, newVarcharFixture.name, newVarcharFixture.ToDomainColumn()),
-		fmt.Sprintf(`
-		CREATE VIEW %s AS
-			SELECT %s,
-			CONCAT(%s, %s) AS %s
-			FROM %s`, f.usersView.viewName,
-			f.usersView.columns[0],
-			f.usersTable.varcharColumns[2].name, f.usersTable.varcharColumns[3].name, f.usersView.columns[1],
-			f.usersTable.tableName),
+		f.deparser.AddColumn(f.usersTable.TableName, newVarcharFixture.Name, newVarcharFixture.ToDomainColumn()),
+		fmt.Sprintf(`CREATE VIEW %s AS %s`, f.usersView.ViewName, f.usersView.Statement),
 	}
 	f.AddRawFile(f.migrationUpMockName(2), f.deparser.WriteScript(upStatements))
 	downStatements := []string{
-		fmt.Sprintf("DROP VIEW IF EXISTS %s", f.usersView.viewName),
-		f.deparser.DropColumn(f.usersTable.tableName, newVarcharFixture.name),
+		fmt.Sprintf("DROP VIEW IF EXISTS %s", f.usersView.ViewName),
+		f.deparser.DropColumn(f.usersTable.TableName, newVarcharFixture.Name),
 	}
 	f.AddRawFile(f.migrationDownMockName(2), f.deparser.WriteScript(downStatements))
 	return newVarcharFixture, f.usersView
 }
 
 func (f *migrationsFixture) AddMigration0003() VarcharFixture {
-	newVarcharFixture := VarcharFixture{name: "abc", cap: 3}
-	f.usersTable.varcharColumns = append(f.usersTable.varcharColumns, newVarcharFixture)
+	newVarcharFixture := VarcharFixture{Name: "abc", Cap: 3}
+	f.usersTable.VarcharColumns = append(f.usersTable.VarcharColumns, newVarcharFixture)
 	upStatements := []string{
-		f.deparser.AddColumn(f.usersTable.tableName, newVarcharFixture.name, newVarcharFixture.ToDomainColumn()),
+		f.deparser.AddColumn(f.usersTable.TableName, newVarcharFixture.Name, newVarcharFixture.ToDomainColumn()),
 	}
 	f.AddRawFile(f.migrationUpMockName(3), f.deparser.WriteScript(upStatements))
 	downStatements := []string{
-		f.deparser.DropColumn(f.usersTable.tableName, newVarcharFixture.name),
+		f.deparser.DropColumn(f.usersTable.TableName, newVarcharFixture.Name),
 	}
 	f.AddRawFile(f.migrationDownMockName(3), f.deparser.WriteScript(downStatements))
 	return newVarcharFixture

@@ -1,2 +1,0 @@
-DROP VIEW IF EXISTS user_phones;
-ALTER TABLE users DROP COLUMN ddi;
