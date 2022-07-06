@@ -12,8 +12,8 @@ type TestDriver interface {
 	AssertViewExistence(viewName string) (bool, error)
 	AssertTextExistence(tableName string, columnName string) (bool, error)
 	AssertVarcharExistence(tableName string, varchar fixtures.VarcharFixture) (bool, error)
-	AssertFixtureExistence(fixture *fixtures.Fixture) (bool, error)
-	AssertViewFixtureExistence(fixture *fixtures.ViewFixture) (bool, error)
+	AssertFixtureExistence(fixture fixtures.Fixture) (bool, error)
+	AssertViewFixtureExistence(fixture fixtures.ViewFixture) (bool, error)
 }
 
 type testDriver struct {
@@ -75,7 +75,7 @@ func (d *testDriver) AssertVarcharExistence(tableName string, varchar fixtures.V
 	return exists, err
 }
 
-func (d *testDriver) AssertFixtureExistence(fixture *fixtures.Fixture) (bool, error) {
+func (d *testDriver) AssertFixtureExistence(fixture fixtures.Fixture) (bool, error) {
 	exists, err := d.AssertTableExistence(fixture.TableName)
 	if err != nil || !exists {
 		return false, err
@@ -95,7 +95,7 @@ func (d *testDriver) AssertFixtureExistence(fixture *fixtures.Fixture) (bool, er
 	return true, nil
 }
 
-func (d *testDriver) AssertViewFixtureExistence(fixture *fixtures.ViewFixture) (bool, error) {
+func (d *testDriver) AssertViewFixtureExistence(fixture fixtures.ViewFixture) (bool, error) {
 	exists, err := d.AssertViewExistence(fixture.ViewName)
 	if err != nil || !exists {
 		return false, err

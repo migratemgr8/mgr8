@@ -12,8 +12,8 @@ import (
 
 type MigrationsFixture interface {
 	AddRawFile(filename, content string)
-	AddMigration0001() *Fixture
-	AddMigration0002() (VarcharFixture, *ViewFixture)
+	AddMigration0001() Fixture
+	AddMigration0002() (VarcharFixture, ViewFixture)
 	AddMigration0003() VarcharFixture
 	TearDown()
 }
@@ -21,8 +21,8 @@ type MigrationsFixture interface {
 type migrationsFixture struct {
 	folderPath  string
 	fileService infrastructure.FileService
-	usersTable  *Fixture
-	usersView   *ViewFixture
+	usersTable  Fixture
+	usersView   ViewFixture
 	deparser    domain.Deparser
 }
 
@@ -32,7 +32,7 @@ func NewMigrationsFixture(folderPath string, fileService infrastructure.FileServ
 	return &migrationsFixture{
 		folderPath:  folderPath,
 		fileService: fileService,
-		usersTable:  &Fixture{TableName: "users"},
+		usersTable:  Fixture{TableName: "users"},
 		deparser:    deparser,
 	}
 }
@@ -42,7 +42,7 @@ func (f *migrationsFixture) AddRawFile(filename, content string) {
 	Expect(err).To(BeNil())
 }
 
-func (f *migrationsFixture) AddMigration0001() *Fixture {
+func (f *migrationsFixture) AddMigration0001() Fixture {
 	f.usersTable.VarcharColumns = []VarcharFixture{
 		{"social_number", 9},
 		{"name", 15},
@@ -59,8 +59,8 @@ func (f *migrationsFixture) AddMigration0001() *Fixture {
 	return f.usersTable
 }
 
-func (f *migrationsFixture) AddMigration0002() (VarcharFixture, *ViewFixture) {
-	f.usersView = &ViewFixture{
+func (f *migrationsFixture) AddMigration0002() (VarcharFixture, ViewFixture) {
+	f.usersView = ViewFixture{
 		ViewName:       "user_phones",
 		VarcharColumns: []VarcharFixture{f.usersTable.VarcharColumns[2]},
 		TextColumns:    []string{"full_phone"},

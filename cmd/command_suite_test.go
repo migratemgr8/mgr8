@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/migratemgr8/mgr8/infrastructure"
 	"github.com/migratemgr8/mgr8/testing/fixtures"
 	"testing"
@@ -17,14 +18,17 @@ import (
 var _t *testing.T
 var dm *mgr8testing.DockerManager
 
-var postgresTestDriver mgr8testing.TestDriver
-var postgresDriver domain.Driver
+var (
+	postgresTestDriver         mgr8testing.TestDriver
+	postgresDriver             domain.Driver
+	postgresMigrations         fixtures.MigrationsFixture
+	userFixture0001            fixtures.Fixture
+	firstNewColumnFixture0002  fixtures.VarcharFixture
+	userViewFixture0002        fixtures.ViewFixture
+	secondNewColumnFixture0003 fixtures.VarcharFixture
+)
+
 var testMigrationsFolder = "apply-test-migrations"
-var postgresMigrations fixtures.MigrationsFixture
-var userFixture0001 *fixtures.Fixture
-var firstNewColumnFixture0002 fixtures.VarcharFixture
-var userViewFixture0002 *fixtures.ViewFixture
-var secondNewColumnFixture0003 fixtures.VarcharFixture
 
 func TestCommand(t *testing.T) {
 	_t = t
@@ -44,6 +48,15 @@ var _ = BeforeSuite(func() {
 	userFixture0001 = postgresMigrations.AddMigration0001()
 	firstNewColumnFixture0002, userViewFixture0002 = postgresMigrations.AddMigration0002()
 	secondNewColumnFixture0003 = postgresMigrations.AddMigration0003()
+
+	mySqlConn := dm.GetConnectionString(global.MySql)
+	db, err := sqlx.Connect(global.MySql.String(), mySqlConn)
+	Expect(err).To(BeNil())
+	Expect(db).To(Not(BeNil()))
+	_, err = db.Exec(`SELECT 1`)
+	Expect(err).To(BeNil())
+	err = db.Close()
+	Expect(err).To(BeNil())
 })
 
 var _ = AfterSuite(func() {
