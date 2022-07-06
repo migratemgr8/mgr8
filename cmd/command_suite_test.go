@@ -65,6 +65,8 @@ func createConfigFileIfNotExists() {
 	if err == nil {
 		return
 	}
+	config, err = os.Create(configPath)
+	Expect(err).To(BeNil())
 	username := "mock-user"
 	hostname, err := os.Hostname()
 	Expect(err).To(BeNil())
