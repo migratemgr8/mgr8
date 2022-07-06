@@ -17,12 +17,12 @@ type LogService interface {
 type LogLevel string
 
 const (
-	InfoLogLevel = "info"
-	DebugLogLevel = "debug"
+	InfoLogLevel     = "info"
+	DebugLogLevel    = "debug"
 	CriticalLogLevel = "critical"
 )
 
-type zapFactory struct { }
+type zapFactory struct{}
 
 func newZapFactory() *zapFactory {
 	return &zapFactory{}
@@ -36,13 +36,14 @@ func (*zapFactory) getConfig(level zapcore.Level) zap.Config {
 	}
 
 	config := zap.Config{
-		Level:            zap.NewAtomicLevelAt(level),
-		Development:      true,
-		Encoding:         "console",
-		EncoderConfig:    encoderConfig,
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stdout"},
-		DisableCaller:    true,
+		Level:             zap.NewAtomicLevelAt(level),
+		Development:       true,
+		Encoding:          "console",
+		EncoderConfig:     encoderConfig,
+		OutputPaths:       []string{"stdout"},
+		ErrorOutputPaths:  []string{"stdout"},
+		DisableCaller:     true,
+		DisableStacktrace: true,
 	}
 
 	return config
@@ -70,10 +71,10 @@ func (z *zapFactory) Build(level LogLevel) (*zap.SugaredLogger, error) {
 }
 
 type logService struct {
-	logger   *zap.SugaredLogger
+	logger *zap.SugaredLogger
 }
 
-func NewLogService(logLevel LogLevel) (*logService, error){
+func NewLogService(logLevel LogLevel) (*logService, error) {
 	zapFact := newZapFactory()
 	logger, err := zapFact.Build(logLevel)
 	if err != nil {
@@ -93,4 +94,3 @@ func (l *logService) Debug(args ...interface{}) {
 func (l *logService) Critical(args ...interface{}) {
 	l.logger.Error(args)
 }
-
