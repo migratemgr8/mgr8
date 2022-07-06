@@ -29,9 +29,15 @@ var (
 	secondNewColumnFixture0003 fixtures.VarcharFixture
 )
 
-var testMigrationsFolder = "apply-test-migrations"
+var (
+	testMigrationsFolder = "apply-test-migrations"
+	mockUser             = "mock-user"
+)
 
-func TestCommand(t *testing.T) {
+func TestCommandIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration tests")
+	}
 	_t = t
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Command Test Suite")
@@ -67,7 +73,7 @@ func createConfigFileIfNotExists() {
 	}
 	config, err = os.Create(configPath)
 	Expect(err).To(BeNil())
-	username := "mock-user"
+	username := mockUser
 	hostname, err := os.Hostname()
 	Expect(err).To(BeNil())
 	err = applications.InsertUserDetails(username, hostname, config)

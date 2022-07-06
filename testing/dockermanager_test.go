@@ -11,7 +11,10 @@ import (
 
 var _t *testing.T
 
-func TestTesting(t *testing.T) {
+func TestTestingIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration tests")
+	}
 	_t = t
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Testing Test Suite")
