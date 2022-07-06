@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/migratemgr8/mgr8/applications"
 	"github.com/migratemgr8/mgr8/infrastructure"
 	"github.com/migratemgr8/mgr8/testing/fixtures"
@@ -51,15 +50,6 @@ var _ = BeforeSuite(func() {
 	userFixture0001 = postgresMigrations.AddMigration0001()
 	firstNewColumnFixture0002, userViewFixture0002 = postgresMigrations.AddMigration0002()
 	secondNewColumnFixture0003 = postgresMigrations.AddMigration0003()
-
-	mySqlConn := dm.GetConnectionString(global.MySql)
-	db, err := sqlx.Connect(global.MySql.String(), mySqlConn)
-	Expect(err).To(BeNil())
-	Expect(db).To(Not(BeNil()))
-	_, err = db.Exec(`SELECT 1`)
-	Expect(err).To(BeNil())
-	err = db.Close()
-	Expect(err).To(BeNil())
 })
 
 var _ = AfterSuite(func() {
