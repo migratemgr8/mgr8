@@ -41,6 +41,18 @@ var _ = Describe("Apply integration test", func() {
 				AssertStateBeforeAllMigrations()
 			})
 		})
+		When("different commands are executed sequentially", func() {
+			It("should work as expected", func() {
+				executeApply([]string{"up", "2"})
+				AssertStateAfterMigration0002AndBefore0003()
+				executeApply([]string{"down", "1"})
+				AssertStateAfterMigration0001AndBefore0002()
+				executeApply([]string{"up"})
+				AssertStateAfterMigration0002AndBefore0003()
+				executeApply([]string{"down", "2"})
+				AssertStateBeforeAllMigrations()
+			})
+		})
 	})
 })
 
