@@ -29,7 +29,8 @@ var _ = Describe("Generate Command", func() {
 			driver = domain_mock.NewMockDriver(ctrl)
 			migrationFileServiceMock = applications_mock.NewMockMigrationFileService(ctrl)
 			fileService = infrastructure_mock.NewMockFileService(ctrl)
-			subject = NewGenerateCommand(driver, migrationFileServiceMock, fileService)
+			loggerMock := anyLog(ctrl)
+			subject = NewGenerateCommand(driver, migrationFileServiceMock, fileService, loggerMock)
 			deparser = domain_mock.NewMockDeparser(ctrl)
 
 		})

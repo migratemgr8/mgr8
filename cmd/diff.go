@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/migratemgr8/mgr8/applications"
 	"github.com/migratemgr8/mgr8/domain"
@@ -25,6 +24,7 @@ func (g *diff) execute(args []string, databaseURL string, migrationsDir string, 
 		driver,
 		applications.NewMigrationFileService(fileService, applications.NewFileNameFormatter(clock), driver, logService),
 		fileService,
+		logService,
 	)
 
 	err = generateCommand.Execute(&applications.GenerateParameters{
@@ -33,7 +33,7 @@ func (g *diff) execute(args []string, databaseURL string, migrationsDir string, 
 		MigrationDir:  migrationsDir,
 	})
 	if err != nil {
-		log.Print(err)
+		logService.Critical("Failed generating diff migration")
 	}
-	return err
+	return nil
 }
