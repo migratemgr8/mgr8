@@ -34,7 +34,7 @@ INTEGRATION_COVERAGE:= $(shell go tool cover -func=integration_coverage.txt | ta
 
 .PHONY: integration-display-coverage
 integration-display-coverage:
-	@echo "Unit Coverage: $(INTEGRATION_COVERAGE)"
+	@echo "Integration Coverage: $(INTEGRATION_COVERAGE)"
 
 .PHONY: check
 check: test integration-test
