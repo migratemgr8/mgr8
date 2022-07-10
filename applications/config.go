@@ -127,7 +127,7 @@ func (c *ConfigurationService) GetConfigurations() (Configuration, error) {
 	configuration := Configuration{}
 
 	// if running with docker use env configuration
-	if os.Getenv(RunWithDockerEnv) != "" {
+	if os.Getenv(RunWithDockerEnv) == "true" {
 		usernameEnv := os.Getenv(UsernameEnv)
 		if usernameEnv == "" {
 			return configuration, errors.New("no username was found, set it on env " + UsernameEnv)
