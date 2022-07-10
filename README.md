@@ -73,7 +73,7 @@ Pull latest image with `docker pull migratemgr8/mgr8:latest` or build it yoursel
 
 Run commands:
 ```bash
-docker run -v {{ migrations path }}:/migrations --network host -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} migratemgr8/mgr8 <command>
+docker run -v {{ migrations path }}:/migrations --network host -e RUN_WITH_DOCKER=true -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} migratemgr8/mgr8 <command>
 ```
 Make sure to replace the variables surrounded by double curly braces.
 
