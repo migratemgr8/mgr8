@@ -265,20 +265,37 @@ func (d *postgresDriver) parseColumn(columnDefinition *pg_query.ColumnDef) *doma
 	datatype := columnDefinition.TypeName.Names[1].GetString_().GetStr()
 	parameters := make(map[string]interface{})
 
-	if datatype == "varchar" {
+	if hasSingleArg(datatype) {
 		parameters["size"] = columnDefinition.TypeName.Typmods[0].GetAConst().Val.GetInteger().Ival
 	}
 
+	if hasDoubleArg(datatype) {
+		parameters["precision"] = columnDefinition.TypeName.Typmods[0].GetAConst().Val.GetInteger().Ival
+		parameters["scale"] = columnDefinition.TypeName.Typmods[1].GetAConst().Val.GetInteger().Ival
+	}
+
 	isNotNull := false
+	defaultValue := interface{}(nil)
+
 	for _, constraint := range columnDefinition.Constraints {
-		if constraint.GetConstraint().GetContype().String() == "CONSTR_NOTNULL" {
+		if constraint.GetConstraint().GetContype() == pg_query.ConstrType_CONSTR_NOTNULL {
 			isNotNull = true
+		}
+		if constraint.GetConstraint().GetContype() == pg_query.ConstrType_CONSTR_DEFAULT {
+			constant := constraint.GetConstraint().RawExpr.GetAConst().Val
+			switch constant.Node.(type) {
+			case *pg_query.Node_String_:
+				defaultValue = constant.GetString_().Str
+			case *pg_query.Node_Integer:
+				defaultValue = constant.GetInteger().Ival
+			}
 		}
 	}
 
 	return &domain.Column{
-		Datatype:   datatype,
-		Parameters: parameters,
-		IsNotNull:  isNotNull,
+		Datatype:     datatype,
+		Parameters:   parameters,
+		IsNotNull:    isNotNull,
+		DefaultValue: defaultValue,
 	}
 }

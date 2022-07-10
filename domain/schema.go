@@ -15,9 +15,10 @@ func NewTable(name string, columns map[string]*Column) *Table {
 }
 
 type Column struct {
-	Datatype   string
-	Parameters map[string]interface{}
-	IsNotNull  bool
+	Datatype     string
+	Parameters   map[string]interface{}
+	IsNotNull    bool
+	DefaultValue interface{}
 }
 
 type View struct {

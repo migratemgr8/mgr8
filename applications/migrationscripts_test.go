@@ -67,7 +67,9 @@ var _ = Describe("Migration Scripts", func() {
 			driver.EXPECT().Deparser().Return(mockDeparser)
 			mockDeparser.EXPECT().WriteScript([]string{"statement"}).Return("sql")
 			fileService.EXPECT().Write("directory", "formatted_filename", "sql")
-			subject = NewMigrationFileService(fileService, formatter, driver)
+			mockLogService := anyLog(ctrl)
+
+			subject = NewMigrationFileService(fileService, formatter, driver, mockLogService)
 		})
 		When(fmt.Sprintf("Asked to generated"), func() {
 			It("Generates expected file", func() {
@@ -83,7 +85,8 @@ var _ = Describe("Migration Scripts", func() {
 			ctrl := gomock.NewController(_t)
 			clock := infrastructure_mock.NewMockClock(ctrl)
 			fileService = infrastructure_mock.NewMockFileService(ctrl)
-			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), domain_mock.NewMockDriver(ctrl))
+			mockLogService := anyLog(ctrl)
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), domain_mock.NewMockDriver(ctrl), mockLogService)
 		})
 		When("Has two migration files", func() {
 			It("Next migration number is 3", func() {
@@ -131,7 +134,7 @@ var _ = Describe("Migration Scripts", func() {
 			clock := infrastructure_mock.NewMockClock(ctrl)
 			fileService = infrastructure_mock.NewMockFileService(ctrl)
 			driver = domain_mock.NewMockDriver(ctrl)
-			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver)
+			subject = NewMigrationFileService(fileService, NewFileNameFormatter(clock), driver, anyLog(ctrl))
 		})
 		When("Reads file successfully", func() {
 			It("Generates expected filename", func() {
@@ -154,3 +157,11 @@ var _ = Describe("Migration Scripts", func() {
 	})
 
 })
+
+func anyLog(ctrl *gomock.Controller) *applications_mock.MockLogService {
+	mockLogService := applications_mock.NewMockLogService(ctrl)
+	mockLogService.EXPECT().Info(gomock.Any()).AnyTimes()
+	mockLogService.EXPECT().Critical(gomock.Any()).AnyTimes()
+	mockLogService.EXPECT().Debug(gomock.Any()).AnyTimes()
+	return mockLogService
+}
