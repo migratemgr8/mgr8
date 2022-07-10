@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kenji-yamane/mgr8/applications"
-	"github.com/kenji-yamane/mgr8/domain"
-	"github.com/kenji-yamane/mgr8/infrastructure"
+	"github.com/migratemgr8/mgr8/applications"
+	"github.com/migratemgr8/mgr8/domain"
+	"github.com/migratemgr8/mgr8/infrastructure"
 )
 
 type apply struct {
@@ -36,7 +36,7 @@ type Migrations struct {
 	isUpType bool
 }
 
-func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver) error {
+func (a *apply) execute(args []string, databaseURL string, migrationsDir string, driver domain.Driver, verbosity infrastructure.LogLevel) error {
 	a.hashService = applications.NewHashService(infrastructure.NewFileService())
 	dir := migrationsDir
 	migrationFiles, err := getMigrationsFiles(dir)

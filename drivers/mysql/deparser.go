@@ -3,7 +3,7 @@ package mysql
 import (
 	"fmt"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 type deparser struct{}
@@ -59,6 +59,16 @@ func (d *deparser) MakeColumnNullable(tableName, columnName string, column *doma
 	}
 	columnDatatype := d.columnDatatype(columnName, newColumn)
 	return fmt.Sprintf("ALTER TABLE %s MODIFY %s NULL", tableName, columnDatatype)
+}
+
+func (d *deparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
+	_, hasSize := column.Parameters["size"]
+
+	if hasSize {
+		return fmt.Sprintf("ALTER TABLE %s MODIFY %s %s(%s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["size"]))
+	} else {
+		return fmt.Sprintf("ALTER TABLE %s MODIFY %s %s(%s, %s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["precision"]), fmt.Sprint(column.Parameters["scale"]))
+	}
 }
 
 func (d *deparser) WriteScript(statements []string) string {

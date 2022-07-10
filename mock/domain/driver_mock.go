@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	domain "github.com/kenji-yamane/mgr8/domain"
+	domain "github.com/migratemgr8/mgr8/domain"
 )
 
 // MockDriver is a mock of Driver interface.
@@ -327,6 +327,20 @@ func (m *MockDeparser) AddColumn(tableName, columnName string, column *domain.Co
 func (mr *MockDeparserMockRecorder) AddColumn(tableName, columnName, column interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddColumn", reflect.TypeOf((*MockDeparser)(nil).AddColumn), tableName, columnName, column)
+}
+
+// ChangeDataTypeParameters mocks base method.
+func (m *MockDeparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ChangeDataTypeParameters", tableName, columnName, column)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// ChangeDataTypeParameters indicates an expected call of ChangeDataTypeParameters.
+func (mr *MockDeparserMockRecorder) ChangeDataTypeParameters(tableName, columnName, column interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeDataTypeParameters", reflect.TypeOf((*MockDeparser)(nil).ChangeDataTypeParameters), tableName, columnName, column)
 }
 
 // CreateTable mocks base method.

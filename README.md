@@ -40,6 +40,14 @@ Set through command flag `--driver`.
 
 - **dir**: Migrations directory. <br/>
 Set through command flag `--dir`.
+
+#### Optional flags
+
+- **verbose**: Prints info logs. Mutually exclusive with `silent`.
+  
+- **silent**: Only prints critical logs. Mutually exclusive with `verbose`.
+
+
 ### Execute migrations
 
 Requires: **database**, **dir**, **driver** <br/>

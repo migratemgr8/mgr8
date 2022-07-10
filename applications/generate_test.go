@@ -6,10 +6,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/kenji-yamane/mgr8/domain"
-	applications_mock "github.com/kenji-yamane/mgr8/mock/applications"
-	domain_mock "github.com/kenji-yamane/mgr8/mock/domain"
-	infrastructure_mock "github.com/kenji-yamane/mgr8/mock/infrastructure"
+	"github.com/migratemgr8/mgr8/domain"
+	applications_mock "github.com/migratemgr8/mgr8/mock/applications"
+	domain_mock "github.com/migratemgr8/mgr8/mock/domain"
+	infrastructure_mock "github.com/migratemgr8/mgr8/mock/infrastructure"
 )
 
 var _ = Describe("Generate Command", func() {
@@ -29,7 +29,8 @@ var _ = Describe("Generate Command", func() {
 			driver = domain_mock.NewMockDriver(ctrl)
 			migrationFileServiceMock = applications_mock.NewMockMigrationFileService(ctrl)
 			fileService = infrastructure_mock.NewMockFileService(ctrl)
-			subject = NewGenerateCommand(driver, migrationFileServiceMock, fileService)
+			loggerMock := anyLog(ctrl)
+			subject = NewGenerateCommand(driver, migrationFileServiceMock, fileService, loggerMock)
 			deparser = domain_mock.NewMockDeparser(ctrl)
 
 		})

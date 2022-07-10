@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/kenji-yamane/mgr8/domain"
+	"github.com/migratemgr8/mgr8/domain"
 )
 
 type deparser struct{}
@@ -58,14 +58,14 @@ func (d *deparser) CreateTable(table *domain.Table) string {
 		}
 
 		if column.IsNotNull {
-			statement = statement + fmt.Sprintf(" NOT NULL")
+			statement = statement + " NOT NULL"
 		}
 
-		statement = statement + fmt.Sprintf(",\n")
+		statement = statement + ",\n"
 	}
 
 	statement = statement[0 : len(statement)-2]
-	statement = statement + fmt.Sprintf("\n)")
+	statement = statement + "\n)"
 	return statement
 }
 
@@ -87,12 +87,23 @@ func (d *deparser) AddColumn(tableName, columnName string, column *domain.Column
 func (d *deparser) DropColumn(tableName, columnName string) string {
 	return fmt.Sprintf("ALTER TABLE %s DROP COLUMN %s", tableName, columnName)
 }
+
 func (d *deparser) MakeColumnNotNull(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s SET NOT NULL", tableName, columnName)
 }
 
 func (d *deparser) MakeColumnNullable(tableName, columnName string, column *domain.Column) string {
 	return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL", tableName, columnName)
+}
+
+func (d *deparser) ChangeDataTypeParameters(tableName, columnName string, column *domain.Column) string {
+	_, hasSize := column.Parameters["size"]
+
+	if hasSize {
+		return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s TYPE %s(%s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["size"]))
+	} else {
+		return fmt.Sprintf("ALTER TABLE %s ALTER COLUMN %s TYPE %s(%s, %s)", tableName, columnName, column.Datatype, fmt.Sprint(column.Parameters["precision"]), fmt.Sprint(column.Parameters["scale"]))
+	}
 }
 
 func (d *deparser) WriteScript(statements []string) string {
