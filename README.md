@@ -67,6 +67,16 @@ When committing to a repository, check if the reference and the latest schema ma
 
 To generate an empty migration (e.g. for DML), use `./bin/mgr8 generate empty`.
 
+### Run with docker
+
+Pull latest image with `docker pull migratemgr8/mgr8:latest` or build it yourself with `make build-docker-image`.
+
+Run commands:
+```bash
+docker run -v {{ migrations path }}:/migrations --network host -e RUN_WITH_DOCKER=true -e MGR8_USERNAME={{ logs username }} -e DB_HOST={{ database connection string }} migratemgr8/mgr8 <command>
+```
+Make sure to replace the variables surrounded by double curly braces.
+
 ## Develop
 
 ### Requirements
@@ -102,11 +112,17 @@ To add a new mock, add new lines to the `mock` command in the Makefile.
 
 Executing migrations with postgres driver
 ```bash
+# CLI version
 ./bin/mgr8 apply up --database=postgres://root:root@localhost:5432/core?sslmode=disable --dir=./migrations
+# Docker version
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username migratemgr8/mgr8 apply up
 ```
 
 Executing migrations with mysql driver
 ```bash
+# CLI version
 ./bin/mgr8 apply up --database=root:root@tcp\(localhost:3306\)/core --dir=./migrations --driver=mysql
+# Docker version
+docker run -v $PWD/migrations:/migrations -e DB_HOST=postgres://root:root@localhost:5432/core?sslmode=disable --network host -e MGR8_USERNAME=username migratemgr8/mgr8 apply up --driver=mysql
 ```
 

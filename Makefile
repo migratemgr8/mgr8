@@ -5,6 +5,9 @@ GOLANG_CROSS_VERSION ?= v1.18.2
 build: main.go
 	go build -o bin/mgr8 main.go
 
+build-docker-image:
+	docker build . --file Dockerfile --tag migratemgr8/mgr8:latest
+
 install-tools:
 	go install github.com/golang/mock/mockgen@v1.6.0
 

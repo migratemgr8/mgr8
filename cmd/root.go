@@ -76,7 +76,7 @@ func Execute() {
 	}
 	applyCmd.Flags().StringVar(&applyCommand.databaseURL, "database", os.Getenv("DB_HOST"), "Database URL")
 	applyCmd.Flags().StringVar(&applyCommand.driverName, "driver", defaultDriverName, "Driver Name")
-	applyCmd.Flags().StringVar(&applyCommand.migrationsDir, "dir", "", "Migrations Directory")
+	applyCmd.Flags().StringVar(&applyCommand.migrationsDir, "dir", "migrations", "Migrations Directory")
 
 	validateCommand := Command{cmd: &validate{}}
 	validateCmd := &cobra.Command{
