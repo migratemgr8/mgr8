@@ -2,7 +2,7 @@ FROM golang:1.17-alpine3.15 AS builder
 
 RUN apk add --no-cache git gcc musl-dev make
 
-WORKDIR /go/src/github.com/kenji-yamane/mgr8
+WORKDIR /go/src/github.com/migratemgr8/mgr8
 
 ENV GO111MODULE=on
 
