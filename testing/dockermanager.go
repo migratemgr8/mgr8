@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -16,25 +15,23 @@ import (
 	"github.com/migratemgr8/mgr8/testing/databaseconfigs"
 )
 
-type dockerManager struct {
+type DockerManager struct {
 	pool      *dockertest.Pool
 	configs   map[global.Database]DatabaseConfig
 	resources map[global.Database]*dockertest.Resource
-	calls     int64
 }
 
-var m *dockerManager
+var m *DockerManager
 
 var initializeDockerManagerOnce sync.Once
 
-func NewDockerManager() *dockerManager {
+func NewDockerManager() *DockerManager {
 	initializeDockerManagerOnce.Do(initializeDockerManager)
-	atomic.AddInt64(&m.calls, 1)
 	return m
 }
 
 func initializeDockerManager() {
-	m = &dockerManager{calls: 0}
+	m = &DockerManager{}
 	var err error
 	m.pool, err = dockertest.NewPool("")
 	if err != nil {
@@ -77,17 +74,14 @@ func initializeDockerManager() {
 	}
 }
 
-func (m *dockerManager) GetConnectionString(d global.Database) string {
+func (m *DockerManager) GetConnectionString(d global.Database) string {
 	return m.configs[d].DatabaseUrl(m.resources[d])
 }
 
-func (m *dockerManager) CloseAll() error {
-	atomic.AddInt64(&m.calls, -1)
-	if m.calls == 0 {
-		for _, r := range m.resources {
-			if err := m.pool.Purge(r); err != nil {
-				return err
-			}
+func (m *DockerManager) CloseAll() error {
+	for _, r := range m.resources {
+		if err := m.pool.Purge(r); err != nil {
+			return err
 		}
 	}
 	return nil

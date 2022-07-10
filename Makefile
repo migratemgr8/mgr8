@@ -10,7 +10,7 @@ install-tools:
 
 .PHONY: test
 test:
-	go test ./... -coverprofile=coverage.txt
+	go test --short ./... -coverprofile=coverage.txt
 
 .PHONY: coverage-report
 coverage-report:
@@ -21,6 +21,23 @@ UNIT_COVERAGE:= $(shell go tool cover -func=coverage.txt | tail -n 1 | cut -d ' 
 .PHONY: display-coverage
 display-coverage:
 	@echo "Unit Coverage: $(UNIT_COVERAGE)"
+
+.PHONY: integration-test
+integration-test:
+	go test -run Integration ./... -coverprofile=integration_coverage.txt
+
+.PHONY: integration-coverage-report
+integration-coverage-report:
+	go tool cover -html=integration_coverage.txt
+
+INTEGRATION_COVERAGE:= $(shell go tool cover -func=integration_coverage.txt | tail -n 1 | cut -d ' ' -f 3 | rev | cut -c 1-5 | rev)
+
+.PHONY: integration-display-coverage
+integration-display-coverage:
+	@echo "Integration Coverage: $(INTEGRATION_COVERAGE)"
+
+.PHONY: check
+check: test integration-test
 
 .PHONY: release
 release:

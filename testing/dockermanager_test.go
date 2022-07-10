@@ -11,7 +11,10 @@ import (
 
 var _t *testing.T
 
-func TestApplication(t *testing.T) {
+func TestTestingIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration tests")
+	}
 	_t = t
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Testing Test Suite")
@@ -19,7 +22,7 @@ func TestApplication(t *testing.T) {
 
 var _ = Describe("Check Command", func() {
 	var (
-		subject *dockerManager
+		subject *DockerManager
 	)
 
 	BeforeSuite(func() {
