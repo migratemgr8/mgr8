@@ -103,7 +103,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . --file Dockerfile --tag $DOCKER_TAG_LATEST_RELEASE $DOCKER_TAG_RELEASE
+          docker build . --file Dockerfile --tag $DOCKER_TAG_LATEST_RELEASE --tag $DOCKER_TAG_RELEASE
 
       - name: Push to DockerHub
         run: |
