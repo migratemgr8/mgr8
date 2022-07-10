@@ -16,7 +16,7 @@ RUN make build
 
 FROM alpine:3.15
 
-COPY --from=builder /go/src/github.com/kenji-yamane/mgr8/bin/mgr8 /usr/local/bin/mgr8
+COPY --from=builder /go/src/github.com/migratemgr8/mgr8/bin/mgr8 /usr/local/bin/mgr8
 RUN ln -s /usr/local/bin/mgr8 /mgr8
 
 ENTRYPOINT ["mgr8"]
